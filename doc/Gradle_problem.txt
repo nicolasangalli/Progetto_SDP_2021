@@ -1,2 +1,0 @@
-Gradle_problem.txt
-compile 'com.google.code.gson:gson:2.8.6'
