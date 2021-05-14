@@ -7,7 +7,7 @@ import javax.ws.rs.core.Response;
 
 
 @Path("drone")
-public class ServerAmministratore {
+public class DroneInterface {
     @Path("welcome")
     @GET
     @Produces(MediaType.TEXT_PLAIN)
@@ -37,6 +37,14 @@ public class ServerAmministratore {
     public Response removeDrone(Drone d) {
         SmartCity.getInstance().removeDrone(d);
         return Response.ok("Drone removed from SmartCity!").build();
+    }
+
+    @Path("stats")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getStats() {
+        String stats = SmartCity.getInstance().getStats();
+        return Response.ok(stats).build();
     }
 
 }

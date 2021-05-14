@@ -4,6 +4,7 @@ import Drone.Drone;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.util.ArrayList;
 
+
 @XmlRootElement
 public class SmartCity {
 
@@ -55,6 +56,27 @@ public class SmartCity {
             }
         }
         return toPrint;
+    }
+
+    public String prettyPrinter() {
+        ArrayList<Drone> listToPrint = drones;
+        String toPrint = "List of drones in SmartCity:";
+        for(Drone i : listToPrint) {
+            toPrint += "\nid: " + i.getId() + " (...)";
+        }
+        return toPrint;
+    }
+
+    public String getStats() {
+        String stats = "";
+        ArrayList<Drone> listOfDrones = drones;
+        int avgBatteryLevel = 0;
+        for(Drone i : listOfDrones) {
+            avgBatteryLevel += i.getBattery();
+        }
+        avgBatteryLevel /= listOfDrones.size();
+        stats = "Average battery level: " + avgBatteryLevel;
+        return stats;
     }
 
 }
