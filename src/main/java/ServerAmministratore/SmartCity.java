@@ -36,10 +36,11 @@ public class SmartCity {
         }
     }
 
-    public synchronized boolean checkAvailableID(Drone d) {
+    public synchronized boolean checkAvailable(Drone d) {
         int id = d.getId();
+        int port = d.getPort();
         for(Drone i : drones) {
-            if(i.getId() == id) {
+            if(i.getId() == id || i.getPort() == port) {
                 return false;
             }
         }

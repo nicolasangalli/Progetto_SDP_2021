@@ -1,5 +1,6 @@
 package Drone;
 
+import Dronazon.Coordinate;
 import javax.xml.bind.annotation.XmlRootElement;
 
 
@@ -7,27 +8,23 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class Drone {
 
     private int id;
+    private int port;
+    private String serverAmmAddress;
+
+    private Coordinate position;
     private boolean master;
     private int battery;
 
     public Drone() {}
 
-    public Drone(int id) {
+    public Drone(int id, int port, String serverAmmAddress) {
         this.id = id;
+        this.port = port;
+        this.serverAmmAddress = serverAmmAddress;
+
+        position = new Coordinate(-1, -1);
         master = false;
         battery = 100;
-
-        System.out.println("Created new drone with id: " + id);
-        System.out.println("    - battery level: " + battery);
-        System.out.println("    - master: " + master + "\n");
-    }
-
-    public boolean getMaster() {
-        return master;
-    }
-
-    public void setMaster(boolean master) {
-        this.master = master;
     }
 
     public int getId() {
@@ -38,12 +35,49 @@ public class Drone {
         this.id = id;
     }
 
+    public int getPort() {
+        return port;
+    }
+
+    public void setPort(int port) {
+        this.port = port;
+    }
+
+    public String getServerAmmAddress() {
+        return serverAmmAddress;
+    }
+
+    public void setServerAmmAddress(String serverAmmAddress) {
+        this.serverAmmAddress = serverAmmAddress;
+    }
+
+    public Coordinate getPosition() {
+        return position;
+    }
+
+    public void setPosition(Coordinate position) {
+        this.position = position;
+    }
+
+    public boolean getMaster() {
+        return master;
+    }
+
+    public void setMaster(boolean master) {
+        this.master = master;
+    }
+
     public int getBattery() {
         return battery;
     }
 
     public void setBattery(int battery) {
         this.battery = battery;
+    }
+
+    public String getStatus() {
+        String status = "id: " + this.id + "\nport: " + this.port + "\nmaster: " + this.master + "\nbattery level: " + this.battery + "%\nposition: (" + this.position.getX() + "," + this.position.getY() + ")\n";
+        return status;
     }
 
 }

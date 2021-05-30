@@ -1,33 +1,34 @@
 package ServerAmministratore;
 
+import Dronazon.Coordinate;
 import Drone.Drone;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.Random;
 
 
 @Path("drone")
 public class DroneInterface {
-    @Path("welcome")
-    @GET
-    @Produces(MediaType.TEXT_PLAIN)
-    public Response getWelcome() {
-        return Response.ok("Welcome to SmartCity!").build();
-    }
-
     @Path("add")
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response addNewDrone(Drone d) {
-        String dronesList = "";
-        if(SmartCity.getInstance().checkAvailableID(d)) {
+        System.out.println("Drone " + d.getId() + " ask to be added to SmartCity");
+        if(SmartCity.getInstance().checkAvailable(d)) {
+            Random random = new Random();
+            Coordinate position = new Coordinate(random.nextInt(10), random.nextInt(10));
+            d.setPosition(position);
             SmartCity.getInstance().addNewDrone(d);
+
+            System.out.println("Drone " + d.getId() + " added to SmartCity!");
+            String dronesList = SmartCity.getInstance().prettyPrinter(d);
+            return Response.ok(dronesList).build();
         } else {
-            dronesList = "WARNING: drone not accepted - id already used\n";
+            System.out.println("Drone " + d.getId() + " NOT added to SmartCity (id or port already in use)!");
+            return Response.status(Response.Status.NOT_ACCEPTABLE).build();
         }
-        dronesList = SmartCity.getInstance().prettyPrinter(d);
-        return Response.ok(dronesList).build();
     }
 
     @Path("remove")
