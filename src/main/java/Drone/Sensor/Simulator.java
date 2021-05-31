@@ -1,5 +1,7 @@
-import java.util.Calendar;
+package Drone.Sensor;
+
 import java.util.Random;
+
 
 public abstract class Simulator extends Thread {
 

@@ -1,3 +1,6 @@
+package Drone.Sensor;
+
+
 public class Measurement implements Comparable<Measurement> {
 
     private String id;
@@ -54,4 +57,5 @@ public class Measurement implements Comparable<Measurement> {
     public String toString(){
         return value + " " + timestamp;
     }
+
 }

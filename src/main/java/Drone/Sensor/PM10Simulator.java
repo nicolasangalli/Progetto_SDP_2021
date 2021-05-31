@@ -1,5 +1,7 @@
-public class PM10Simulator extends Simulator {
+package Drone.Sensor;
 
+
+public class PM10Simulator extends Simulator {
 
     private final double A = 15;
     private final double W = 0.05;
@@ -38,4 +40,5 @@ public class PM10Simulator extends Simulator {
         return Math.abs(A * Math.sin(W*t) + rnd.nextGaussian()*0.1)+15;
 
     }
+
 }
