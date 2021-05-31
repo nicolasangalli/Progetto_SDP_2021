@@ -3,6 +3,7 @@ package Drone.Sensor;
 import java.util.ArrayList;
 import java.util.List;
 
+
 public class MeasurementBuffer implements Buffer {
 
     List<Measurement> list;

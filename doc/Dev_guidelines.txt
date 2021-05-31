@@ -1,0 +1,60 @@
+Dronazon
+
+- ogni 5 sec:
+	- genera ordine (id, punto di partenza, punto di arrivo);
+	- pubblicazione ordine sul broker MQTT al topic dronazon/smartcity/orders/;
+
+
+
+Drone
+
+- Inizializzazione (main thread):
+	- creazione del drone (id, porta, indirizzo server amministratore);
+	- REST call al ServerAmministratore per entrare nella SmartCity:
+		- richiesta accetta:
+			- riceve la posizione nella SmartCity e l'elenco degli altri droni (id, IP?, porta?, master);
+			- richiesta inserimento nella rete ad anello:
+				- inserimento riuscito:
+					- se è l'unico dell'anello si proclama master, altrimenti comunica la sua posizione e cerca il drone master;
+					- avvio dei thread "controllo batteria", "controllo rete", sensore inquinamento";
+					- linea di comando per l'uscita con il comando quit (metodo stop);
+				- inserimento fallito:
+					- stop;
+		- richiesta rifiutata:
+			- stop;
+
+
+- Controllo batteria:
+	- controllo il livello di batteria:
+		- >= 15%:
+			- ok, non faccio nulla;
+		- < 15%:
+			Metodo stop:
+				- termino l'eventuale consegna in corso e ...;
+				- controllo se il drone è il master o no:
+					- master:
+						- disconnessione dal broker MQTT;
+						- assegnare le consegne rimanenti;
+				- chiusura connessione con altri droni (forzata, non comunicare la propria uscita);
+				- controllo se il drone è il master o no:
+					- master:
+						- invio al ServerAmministratore le statistiche globali;
+				- REST call al ServerAmministratore per uscire dalla SmartCity:
+					- in ogni caso, stop;
+
+- Controllo rete:
+	- ogni n secondi:
+		- controllo che il nodo successivo sia raggiungibile:
+			- si:
+				- non faccio nulla;
+			- no:
+				- ricostruisco l'anello;
+				- controllo se era il master:
+					- master:
+						- elezione nuovo master (Chang and Roberts), viene scelto il drone con batteria maggiore (in caso di parità con id maggiore);
+						- ricezione dell'id del nuovo master;
+						- invio della posizione al nuovo master;
+
+- Sensori inquinamento:
+	- avvio il rilevamento;
+
