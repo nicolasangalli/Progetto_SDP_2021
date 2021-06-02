@@ -16,13 +16,27 @@ Drone
 			- richiesta inserimento nella rete ad anello:
 				- inserimento riuscito:
 					- se è l'unico dell'anello si proclama master, altrimenti comunica la sua posizione e cerca il drone master;
-					- avvio dei thread "controllo batteria", "controllo rete", sensore inquinamento";
-					- linea di comando per l'uscita con il comando quit (metodo stop);
+					- avvio dei thread "linea di comando", controllo batteria", "controllo rete", "sensore inquinamento";
 				- inserimento fallito:
 					- stop;
 		- richiesta rifiutata:
 			- stop;
 
+- Controllo rete:
+	- ogni n secondi:
+		- controllo che il nodo successivo sia raggiungibile:
+			- si:
+				- non faccio nulla;
+			- no:
+				- ricostruisco l'anello;
+				- controllo se era il master:
+					- master:
+						- elezione nuovo master (Chang and Roberts), viene scelto il drone con batteria maggiore (in caso di parità con id maggiore);
+						- ricezione dell'id del nuovo master;
+						- invio della posizione al nuovo master;
+
+- Linea di comando:
+	- linea di comando per l'uscita con il comando quit (metodo stop);
 
 - Controllo batteria:
 	- controllo il livello di batteria:
@@ -42,19 +56,13 @@ Drone
 				- REST call al ServerAmministratore per uscire dalla SmartCity:
 					- in ogni caso, stop;
 
-- Controllo rete:
-	- ogni n secondi:
-		- controllo che il nodo successivo sia raggiungibile:
-			- si:
-				- non faccio nulla;
-			- no:
-				- ricostruisco l'anello;
-				- controllo se era il master:
-					- master:
-						- elezione nuovo master (Chang and Roberts), viene scelto il drone con batteria maggiore (in caso di parità con id maggiore);
-						- ricezione dell'id del nuovo master;
-						- invio della posizione al nuovo master;
-
 - Sensori inquinamento:
-	- avvio il rilevamento;
-
+	- avvio il rilevamento:
+		- inserisco il valore nel buffer (add);
+		- controllo che il buffer sia pieno (8):
+			- pieno:
+				- Metodo readAllAndClean:
+					- calcolo la media degli 8 valori;
+					- svuoto i primi 4 valori dal buffer;
+			- NON pieno:
+				- ok, continuo;
