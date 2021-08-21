@@ -2,6 +2,7 @@ package Drone;
 
 import Dronazon.Coordinate;
 import javax.xml.bind.annotation.XmlRootElement;
+import java.util.ArrayList;
 
 
 @XmlRootElement
@@ -12,6 +13,7 @@ public class Drone {
     private String serverAmmAddress;
 
     private Coordinate position;
+    private ArrayList<String[]> dronesList;
     private boolean master;
     private int battery;
 
@@ -23,6 +25,7 @@ public class Drone {
         this.serverAmmAddress = serverAmmAddress;
 
         position = new Coordinate(-1, -1);
+        dronesList = new ArrayList<>();
         master = false;
         battery = 100;
     }
@@ -57,6 +60,14 @@ public class Drone {
 
     public void setPosition(Coordinate position) {
         this.position = position;
+    }
+
+    public ArrayList<String[]> getDronesList() {
+        return dronesList;
+    }
+
+    public void setDronesList(ArrayList<String[]> dronesList) {
+        this.dronesList = dronesList;
     }
 
     public boolean getMaster() {

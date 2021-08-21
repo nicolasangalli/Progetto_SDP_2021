@@ -1,14 +1,16 @@
 package ServerAmministratore;
 
+import Dronazon.Coordinate;
 import Drone.Drone;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.util.ArrayList;
+import java.util.Random;
 
 
 @XmlRootElement
 public class SmartCity {
 
-    private ArrayList<Drone> drones;
+    private ArrayList<String[]> drones;
     private static SmartCity instance;
 
     private SmartCity() {
@@ -22,62 +24,40 @@ public class SmartCity {
         return instance;
     }
 
-    public synchronized void addNewDrone(Drone d) {
-        drones.add(d);
-    }
-
-    public synchronized void removeDrone(Drone d) {
-        int id = d.getId();
-        for(Drone i : drones) {
-            if(i.getId() == id) {
-                drones.remove(i);
-                break;
-            }
-        }
-    }
-
-    public synchronized boolean checkAvailable(Drone d) {
-        int id = d.getId();
-        int port = d.getPort();
-        for(Drone i : drones) {
-            if(i.getId() == id || i.getPort() == port) {
+    public synchronized boolean checkAvailable(int id, int port) {
+        for(String[] drone : drones) {
+            if(drone[0].equals(String.valueOf(id)) || drone[1].equals(String.valueOf(port))) {
                 return false;
             }
         }
         return true;
     }
 
-    public String prettyPrinter(Drone d) {
-        int id = d.getId();
-        ArrayList<Drone> listToPrint = drones;
-        String toPrint = "List of other drones in SmartCity:";
-        for(Drone i : listToPrint) {
-            if(i.getId() != id) {
-                toPrint += "\nid: " + i.getId() + " (...)";
+    public synchronized void addNewDrone(Drone d) {
+        String[] drone = new String[2];
+        drone[0] = String.valueOf(d.getId());
+        drone[1] = String.valueOf(d.getPort());
+        drones.add(drone);
+    }
+
+    public ArrayList<String[]> getDrones(int id) {
+        ArrayList<String[]> list = drones;
+        ArrayList<String[]> ret = new ArrayList<>();
+
+        //generate random position
+        Random random = new Random();
+        Coordinate position = new Coordinate(random.nextInt(10), random.nextInt(10));
+        String[] pos = new String[2];
+        pos[0] = String.valueOf(position.getX());
+        pos[1] = String.valueOf(position.getY());
+        ret.add(pos);
+
+        for(String[] drone : list) {
+            if(!drone[0].equals(String.valueOf(id))) {
+                ret.add(drone);
             }
         }
-        return toPrint;
-    }
-
-    public String prettyPrinter() {
-        ArrayList<Drone> listToPrint = drones;
-        String toPrint = "List of drones in SmartCity:";
-        for(Drone i : listToPrint) {
-            toPrint += "\nid: " + i.getId() + " (...)";
-        }
-        return toPrint;
-    }
-
-    public String getStats() {
-        String stats = "";
-        ArrayList<Drone> listOfDrones = drones;
-        int avgBatteryLevel = 0;
-        for(Drone i : listOfDrones) {
-            avgBatteryLevel += i.getBattery();
-        }
-        avgBatteryLevel /= listOfDrones.size();
-        stats = "Average battery level: " + avgBatteryLevel;
-        return stats;
+        return ret;
     }
 
 }

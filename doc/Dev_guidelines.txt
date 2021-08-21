@@ -11,8 +11,8 @@ Drone
 - Inizializzazione (main thread):
 	- creazione del drone (id, porta, indirizzo server amministratore);
 	- REST call al ServerAmministratore per entrare nella SmartCity:
-		- richiesta accetta:
-			- riceve la posizione nella SmartCity e l'elenco degli altri droni (id, IP?, porta?, master);
+		- richiesta accetta (per ogni drone salvo id, IP, porta, master, posizione):
+			- riceve la posizione nella SmartCity e l'elenco degli altri droni (id, IP, porta);
 			- richiesta inserimento nella rete ad anello:
 				- inserimento riuscito:
 					- se è l'unico dell'anello si proclama master, altrimenti comunica la sua posizione e cerca il drone master;
@@ -34,6 +34,8 @@ Drone
 						- elezione nuovo master (Chang and Roberts), viene scelto il drone con batteria maggiore (in caso di parità con id maggiore);
 						- ricezione dell'id del nuovo master;
 						- invio della posizione al nuovo master;
+					- NON master:
+						- OK, non faccio nulla;
 
 - Linea di comando:
 	- linea di comando per l'uscita con il comando quit (metodo stop);
@@ -66,3 +68,61 @@ Drone
 					- svuoto i primi 4 valori dal buffer;
 			- NON pieno:
 				- ok, continuo;
+
+
+
+
+
+
+private static void webExit() {
+        //exit from the drones web...
+
+        //Ask ServerAmministratore to remove this drone from SmartCity
+        Client client = Client.create();
+        WebResource webResource = client.resource("http://localhost:8080/drone/remove");
+        ClientResponse response = webResource.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, d);
+        String deleteResp = response.getEntity(String.class);
+        System.out.println(deleteResp);
+    }
+
+    private static void getStats() {
+        //Ask to ServerAmministratore the SmartCity stats
+        Client client = Client.create();
+        WebResource webResource = client.resource("http://localhost:8080/drone/stats");
+        ClientResponse response = webResource.get(ClientResponse.class);
+        String stats = response.getEntity(String.class);
+        System.out.println(stats);
+    }
+
+
+
+@Path("remove")
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.TEXT_PLAIN)
+    public Response removeDrone(Drone d) {
+        SmartCity.getInstance().removeDrone(d);
+        return Response.ok("Drone removed from SmartCity!").build();
+    }
+
+    @Path("stats")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getStats() {
+        String stats = SmartCity.getInstance().getStats();
+        return Response.ok(stats).build();
+    }
+
+
+
+
+
+public synchronized void removeDrone(Drone d) {
+        int id = d.getId();
+        for(Drone i : drones) {
+            if(i.getId() == id) {
+                drones.remove(i);
+                break;
+            }
+        }
+    }

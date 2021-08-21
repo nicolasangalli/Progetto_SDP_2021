@@ -13,8 +13,8 @@ public class AmministratoreInterface {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getDronesList() {
-        String dronesList = SmartCity.getInstance().prettyPrinter();
-        return Response.ok(dronesList).build();
+        //String dronesList = SmartCity.getInstance().prettyPrinter();
+        return Response.ok().build();
     }
 
 }

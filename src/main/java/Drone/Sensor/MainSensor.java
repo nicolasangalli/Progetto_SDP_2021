@@ -3,6 +3,7 @@ package Drone.Sensor;
 
 public class MainSensor {
 
+    //lista delle medie da inviare al master
     public static double avg;
 
     public static void main(String[] args) {

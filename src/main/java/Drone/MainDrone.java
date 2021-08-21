@@ -1,13 +1,13 @@
 package Drone;
 
+import Dronazon.Coordinate;
+import com.google.gson.Gson;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.io.InputStreamReader;
-import java.util.Random;
-import java.util.Scanner;
+import java.util.*;
 
 
 public class MainDrone {
@@ -16,24 +16,15 @@ public class MainDrone {
 
     public static void main(String[] args) {
         Random random = new Random();
+
+        //Drone initialization
         d = new Drone(random.nextInt(10000), random.nextInt(1000)+1000, "http://localhost:8080/");
 
         System.out.println("Created a new drone:");
         System.out.println(d.getStatus());
 
-        if(addToSmartCity()) {
-            //add this to a thread
-            Scanner scanner = new Scanner(new InputStreamReader(System.in));
-            while(true) {
-                System.out.print("Insert a command: ");
-                String input = scanner.nextLine();
-                if(input.trim().equalsIgnoreCase("stats")) {
-                    getStats();
-                } else if(input.trim().equalsIgnoreCase("quit") || input.trim().equalsIgnoreCase("q") || input.trim().equalsIgnoreCase("exit")) {
-                    webExit();
-                    break;
-                }
-            }
+        if(addToSmartCity()) { //REST call to ServerAmministratore
+            System.out.println(d.getStatus());
         }
     }
 
@@ -45,6 +36,23 @@ public class MainDrone {
         ClientResponse response = webResource.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, d);
         if(response.getStatus() == Response.Status.OK.getStatusCode()) {
             System.out.println("Successfully added to Smart City!\n");
+
+            //update position and other drones list
+            String s = response.getEntity(String.class);
+            Gson gson = new Gson();
+            ArrayList respArray = gson.fromJson(s, ArrayList.class);
+            Iterator it = respArray.iterator();
+            ArrayList posArr = (ArrayList) it.next();
+            Coordinate position = new Coordinate(Integer.parseInt((String) posArr.get(0)), Integer.parseInt((String) posArr.get(1)));
+            d.setPosition(position);
+            while(it.hasNext()) {
+                ArrayList dr = (ArrayList) it.next();
+                String[] drone = new String[2];
+                drone[0] = (String) dr.get(0);
+                drone[1] = (String) dr.get(1);
+                d.getDronesList().add(drone);
+            }
+
             return true;
         } else {
             if(response.getStatus() == Response.Status.NOT_ACCEPTABLE.getStatusCode()) {
@@ -54,27 +62,6 @@ public class MainDrone {
             }
             return false;
         }
-        //String otherDrones = response.getEntity(String.class);
-    }
-
-    private static void webExit() {
-        //exit from the drones web...
-
-        //Ask ServerAmministratore to remove this drone from SmartCity
-        Client client = Client.create();
-        WebResource webResource = client.resource("http://localhost:8080/drone/remove");
-        ClientResponse response = webResource.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, d);
-        String deleteResp = response.getEntity(String.class);
-        System.out.println(deleteResp);
-    }
-
-    private static void getStats() {
-        //Ask to ServerAmministratore the SmartCity stats
-        Client client = Client.create();
-        WebResource webResource = client.resource("http://localhost:8080/drone/stats");
-        ClientResponse response = webResource.get(ClientResponse.class);
-        String stats = response.getEntity(String.class);
-        System.out.println(stats);
     }
 
 }
