@@ -1,5 +1,6 @@
 package Dronazon;
 
+import Libraries.Coordinate;
 import com.google.gson.Gson;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
@@ -13,12 +14,12 @@ public class MainDronazon {
     private static int orderIdCount = 0;
     private static Gson gson;
     private static MqttClient dronazon;
+    private static String broker = "tcp://localhost:1883";
     private static String pubTopic = "dronazon/smartcity/orders";
     private static int qos = 2;
 
     public static void main(String[] args) {
         gson = new Gson();
-        String broker = "tcp://localhost:1883";
         String clientId = MqttClient.generateClientId();
 
         try {
@@ -27,7 +28,7 @@ public class MainDronazon {
             connectOptions.setCleanSession(true);
 
             //Connect the dronazon to broker
-            System.out.println("Try to connect Dronazon (id: " + clientId + ") to broker " + broker + " ...");
+            System.out.println("Try to connect Dronazon to broker " + broker + " ...");
             dronazon.connect(connectOptions);
             System.out.println("Dronazon connected to broker MQTT");
         } catch (MqttException me) {
@@ -35,9 +36,9 @@ public class MainDronazon {
         }
 
         while(true) {
-            generateOrder();
             try {
                 Thread.sleep(5000);
+                generateOrder();
             } catch (InterruptedException ie) {
                 ie.printStackTrace();
             }
