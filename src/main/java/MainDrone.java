@@ -4,30 +4,35 @@ import com.google.gson.Gson;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
-
+import io.grpc.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.io.IOException;
 import java.util.*;
 
 
 public class MainDrone {
 
     private static Drone d;
+    private static io.grpc.Server server; //for gRPC call
     private static Client client; //for REST call
     private static WebResource webResource; //for REST call
 
     public static void main(String[] args) {
         //Drone initialization
-        /*io.grpc.Server server = ServerBuilder.forPort(8080)
-                .addService(new SumsServiceImpl())
-                .build();
-
-        server.start();
-        System.out.println("Server started");
-        server.awaitTermination();*/
         Random random = new Random();
-        d = new Drone(random.nextInt(10000), random.nextInt(1000)+1000, "http://localhost:8080/");
 
+        server = ServerBuilder.forPort(random.nextInt(1000) + 1000)
+                            .addService(new NetworkServiceImpl())
+                            .build();
+        try {
+            server.start();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        System.out.println("Server started at port " + server.getPort());
+
+        d = new Drone(random.nextInt(10000), server.getPort(), "http://localhost:8080/");
         client = Client.create();
         webResource = client.resource(d.getServerAmmAddress() + "drone/add");
 
@@ -37,6 +42,7 @@ public class MainDrone {
 
         if(addToSmartCity()) { //REST call to ServerAmministratore
             System.out.println("position: (" + d.getPosition().getX() + "," + d.getPosition().getY() + ")");
+
             //ordering drones list (network structure)
             Collections.sort(d.getDronesList(), new Comparator<DroneSmartCity>() {
                 @Override
@@ -50,8 +56,15 @@ public class MainDrone {
                     return 0;
                 }
             });
+        }
 
+        System.out.println("Other drones in the network:");
+        System.out.println(d.printDronesList());
 
+        try {
+            server.awaitTermination();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
     }
 
