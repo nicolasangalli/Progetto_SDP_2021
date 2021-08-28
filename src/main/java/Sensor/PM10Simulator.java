@@ -1,4 +1,4 @@
-package Drone.Sensor;
+package Sensor;
 
 
 public class PM10Simulator extends Simulator {

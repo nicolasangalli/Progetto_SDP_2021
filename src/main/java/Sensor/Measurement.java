@@ -1,4 +1,4 @@
-package Drone.Sensor;
+package Sensor;
 
 
 public class Measurement implements Comparable<Measurement> {

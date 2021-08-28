@@ -1,5 +1,3 @@
-package Drone;
-
 import Libraries.Coordinate;
 import Libraries.DroneSmartCity;
 import com.google.gson.Gson;
@@ -20,6 +18,13 @@ public class MainDrone {
 
     public static void main(String[] args) {
         //Drone initialization
+        /*io.grpc.Server server = ServerBuilder.forPort(8080)
+                .addService(new SumsServiceImpl())
+                .build();
+
+        server.start();
+        System.out.println("Server started");
+        server.awaitTermination();*/
         Random random = new Random();
         d = new Drone(random.nextInt(10000), random.nextInt(1000)+1000, "http://localhost:8080/");
 

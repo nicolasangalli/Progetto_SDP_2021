@@ -1,4 +1,4 @@
-package Drone.Sensor;
+package Sensor;
 
 import java.util.List;
 

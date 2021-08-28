@@ -1,8 +1,8 @@
-package Drone.Sensor;
+package Sensor;
 
 import java.util.ArrayList;
 import java.util.List;
-import static Drone.Sensor.MainSensor.avg;
+import static Sensor.MainSensor.avg;
 
 
 public class MeasurementBuffer implements Buffer {

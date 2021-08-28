@@ -1,5 +1,3 @@
-package Drone;
-
 import Libraries.Coordinate;
 import Libraries.DroneSmartCity;
 import javax.xml.bind.annotation.XmlRootElement;
