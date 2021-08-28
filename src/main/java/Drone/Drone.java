@@ -1,8 +1,10 @@
 package Drone;
 
-import Dronazon.Coordinate;
+import Libraries.Coordinate;
+import Libraries.DroneSmartCity;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 
 @XmlRootElement
@@ -13,7 +15,7 @@ public class Drone {
     private String serverAmmAddress;
 
     private Coordinate position;
-    private ArrayList<String[]> dronesList;
+    private ArrayList<DroneSmartCity> dronesList;
     private boolean master;
     private int battery;
 
@@ -62,11 +64,11 @@ public class Drone {
         this.position = position;
     }
 
-    public ArrayList<String[]> getDronesList() {
+    public ArrayList<DroneSmartCity> getDronesList() {
         return dronesList;
     }
 
-    public void setDronesList(ArrayList<String[]> dronesList) {
+    public void setDronesList(ArrayList<DroneSmartCity> dronesList) {
         this.dronesList = dronesList;
     }
 
@@ -89,6 +91,16 @@ public class Drone {
     public String getStatus() {
         String status = "id: " + this.id + "\nport: " + this.port + "\nmaster: " + this.master + "\nbattery level: " + this.battery + "%\nposition: (" + this.position.getX() + "," + this.position.getY() + ")\n";
         return status;
+    }
+
+    public String printDronesList() {
+        String toPrint = "";
+        Iterator<DroneSmartCity> it = this.dronesList.iterator();
+        while(it.hasNext()) {
+            DroneSmartCity dsc = it.next();
+            toPrint += "(" + dsc.getId() + "," + dsc.getIp() + "," + dsc.getPort() + ")\n";
+        }
+        return toPrint;
     }
 
 }

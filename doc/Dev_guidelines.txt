@@ -11,8 +11,9 @@ Drone
 - Inizializzazione (main thread):
 	- creazione del drone (id, porta, indirizzo server amministratore);
 	- REST call al ServerAmministratore per entrare nella SmartCity:
-		- richiesta accetta (per ogni drone salvo id, IP, porta, master, posizione):
+		- richiesta accetta (per ogni drone salvo id, IP, porta):
 			- riceve la posizione nella SmartCity e l'elenco degli altri droni (id, IP, porta);
+			- ordine l'elenco dei droni per ID;
 			- richiesta inserimento nella rete ad anello:
 				- inserimento riuscito:
 					- se è l'unico dell'anello si proclama master, altrimenti comunica la sua posizione e cerca il drone master;
@@ -96,33 +97,3 @@ private static void webExit() {
 
 
 
-@Path("remove")
-    @POST
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.TEXT_PLAIN)
-    public Response removeDrone(Drone d) {
-        SmartCity.getInstance().removeDrone(d);
-        return Response.ok("Drone removed from SmartCity!").build();
-    }
-
-    @Path("stats")
-    @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getStats() {
-        String stats = SmartCity.getInstance().getStats();
-        return Response.ok(stats).build();
-    }
-
-
-
-
-
-public synchronized void removeDrone(Drone d) {
-        int id = d.getId();
-        for(Drone i : drones) {
-            if(i.getId() == id) {
-                drones.remove(i);
-                break;
-            }
-        }
-    }

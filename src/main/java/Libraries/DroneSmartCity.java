@@ -1,6 +1,9 @@
-package ServerAmministratore;
+package Libraries;
+
+import javax.xml.bind.annotation.XmlRootElement;
 
 
+@XmlRootElement
 public class DroneSmartCity {
 
     private int id;

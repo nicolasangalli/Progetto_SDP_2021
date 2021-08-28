@@ -1,6 +1,7 @@
 package ServerAmministratore;
 
 import Libraries.Coordinate;
+import Libraries.DroneSmartCity;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.util.ArrayList;
 import java.util.Random;

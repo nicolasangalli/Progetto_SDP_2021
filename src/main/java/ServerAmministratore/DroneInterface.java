@@ -1,6 +1,7 @@
 package ServerAmministratore;
 
 import Libraries.Coordinate;
+import Libraries.DroneSmartCity;
 import com.google.gson.Gson;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
