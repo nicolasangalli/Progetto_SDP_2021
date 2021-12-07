@@ -70,7 +70,7 @@ public class MainDrone {
     private static boolean addToSmartCity() {
         System.out.println("Try to be added to SmartCity...");
 
-        droneSmartCity = new DroneSmartCity(d.getId(), "localhost", d.getPort()); //input for REST call
+        droneSmartCity = new DroneSmartCity(d.getId(), "localhost", d.getPort(), new Coordinate(-1, -1)); //input for REST call
         ClientResponse response = webResource.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, droneSmartCity); //REST call
         if(response.getStatus() == Response.Status.OK.getStatusCode()) {
             System.out.println("Successfully added to SmartCity!\n");
@@ -96,6 +96,7 @@ public class MainDrone {
         int y = (int) (double) it.next();
         Coordinate position = new Coordinate(x, y);
         d.setPosition(position);
+        droneSmartCity.setPosition(position);
         System.out.println("Drone position: (" + d.getPosition().getX() + "," + d.getPosition().getY() + ")\n");
 
 
@@ -112,8 +113,7 @@ public class MainDrone {
         if(d.getNetworkTopology().getDronesList().size() == 1) {
             d.setMasterId(d.getId());
             d.setMaster(true);
-            System.out.println("Drone with id = " + d.getId() + " is the master");
-
+            System.out.println("This drone is the only one in the network, elected as master");
         } else {
             System.out.println("Comunicate to all other drones my insertion in the network...");
             dronesList = d.getNetworkTopology().getDronesList();
@@ -129,6 +129,8 @@ public class MainDrone {
                             .setId(droneSmartCity.getId())
                             .setIp(droneSmartCity.getIp())
                             .setPort(droneSmartCity.getPort())
+                            .setX(droneSmartCity.getPosition().getX())
+                            .setY(droneSmartCity.getPosition().getY())
                             .build();
                     NetworkService.Master response = stub.newDrone(request);
                     d.setMasterId(response.getMasterId());
@@ -141,7 +143,7 @@ public class MainDrone {
     }
 
     private static void startThreads() {
-        Console console = new Console();
+        Console console = new Console(d);
         console.start();
         System.out.println("Console thread started");
     }

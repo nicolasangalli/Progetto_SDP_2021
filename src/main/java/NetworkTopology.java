@@ -3,6 +3,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 
+
 public class NetworkTopology {
 
     private ArrayList<DroneSmartCity> dronesList;
@@ -41,6 +42,14 @@ public class NetworkTopology {
             });
             this.dronesList = dronesList;
         }
+    }
+
+    public String getNetworkDrones() {
+        String ret = "Drones in the network:\n";
+        for (DroneSmartCity dsc : dronesList) {
+            ret += "(" + dsc.getId() + ", ip: " + dsc.getIp() + ", port: " + dsc.getPort() + ", position: (" + dsc.getPosition().getX() + "," + dsc.getPosition().getY() + "))\n";
+        }
+        return ret;
     }
 
 }

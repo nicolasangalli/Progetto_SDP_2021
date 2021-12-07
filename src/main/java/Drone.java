@@ -1,7 +1,5 @@
 import Libraries.Coordinate;
-import Libraries.DroneSmartCity;
 import javax.xml.bind.annotation.XmlRootElement;
-import java.util.Iterator;
 
 
 @XmlRootElement
@@ -96,18 +94,8 @@ public class Drone {
     }
 
     public String getStatus() {
-        String status = "id: " + this.id + "\nport: " + this.port + "\nmaster: " + this.master + "\nbattery level: " + this.battery + "%\nposition: (" + this.position.getX() + "," + this.position.getY() + ")\n";
+        String status = "id: " + this.id + "\nport: " + this.port + "\nmaster: " + this.master + "\nmaster id: " + this.masterId + "\nbattery level: " + this.battery + "%\nposition: (" + this.position.getX() + "," + this.position.getY() + ")\n";
         return status;
-    }
-
-    public String printDronesList() {
-        String toPrint = "";
-        Iterator<DroneSmartCity> it = this.networkTopology.getDronesList().iterator();
-        while(it.hasNext()) {
-            DroneSmartCity dsc = it.next();
-            toPrint += "(" + dsc.getId() + "," + dsc.getIp() + "," + dsc.getPort() + ")\n";
-        }
-        return toPrint;
     }
 
 }

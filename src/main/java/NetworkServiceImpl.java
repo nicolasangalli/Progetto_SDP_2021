@@ -1,5 +1,7 @@
+import Libraries.Coordinate;
 import Libraries.DroneSmartCity;
 import io.grpc.stub.StreamObserver;
+
 
 public class NetworkServiceImpl extends NetworkProtoGrpc.NetworkProtoImplBase {
 
@@ -7,7 +9,7 @@ public class NetworkServiceImpl extends NetworkProtoGrpc.NetworkProtoImplBase {
 
     @Override
     public void newDrone(NetworkService.DroneSmartCity request, StreamObserver<NetworkService.Master> responseObserver) {
-        DroneSmartCity droneSmartCity = new DroneSmartCity(request.getId(), request.getIp(), request.getPort());
+        DroneSmartCity droneSmartCity = new DroneSmartCity(request.getId(), request.getIp(), request.getPort(), new Coordinate(request.getX(), request.getY()));
         d.getNetworkTopology().addNewDrone(droneSmartCity);
 
         NetworkService.Master response = NetworkService.Master.newBuilder()
