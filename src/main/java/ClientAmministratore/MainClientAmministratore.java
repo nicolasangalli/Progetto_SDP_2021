@@ -1,4 +1,4 @@
-package Amministratore;
+package ClientAmministratore;
 
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
@@ -8,7 +8,7 @@ import java.io.InputStreamReader;
 import java.util.Scanner;
 
 
-public class MainAmministratore {
+public class MainClientAmministratore {
 
     public static void main(String[] args) {
         String commandsList = "List of possible commands:\n\n" +

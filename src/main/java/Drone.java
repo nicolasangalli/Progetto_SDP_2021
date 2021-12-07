@@ -1,7 +1,6 @@
 import Libraries.Coordinate;
 import Libraries.DroneSmartCity;
 import javax.xml.bind.annotation.XmlRootElement;
-import java.util.ArrayList;
 import java.util.Iterator;
 
 
@@ -13,8 +12,9 @@ public class Drone {
     private String serverAmmAddress;
 
     private Coordinate position;
-    private ArrayList<DroneSmartCity> dronesList;
+    private NetworkTopology networkTopology;
     private boolean master;
+    private int masterId;
     private int battery;
 
     public Drone() {}
@@ -25,8 +25,9 @@ public class Drone {
         this.serverAmmAddress = serverAmmAddress;
 
         position = new Coordinate(-1, -1);
-        dronesList = new ArrayList<>();
+        networkTopology = new NetworkTopology();
         master = false;
+        masterId = -1;
         battery = 100;
     }
 
@@ -62,12 +63,20 @@ public class Drone {
         this.position = position;
     }
 
-    public ArrayList<DroneSmartCity> getDronesList() {
-        return dronesList;
+    public NetworkTopology getNetworkTopology() {
+        return networkTopology;
     }
 
-    public void setDronesList(ArrayList<DroneSmartCity> dronesList) {
-        this.dronesList = dronesList;
+    public void setNetworkTopology(NetworkTopology networkTopology) {
+        this.networkTopology = networkTopology;
+    }
+
+    public int getMasterId() {
+        return masterId;
+    }
+
+    public void setMasterId(int masterId) {
+        this.masterId = masterId;
     }
 
     public boolean getMaster() {
@@ -93,7 +102,7 @@ public class Drone {
 
     public String printDronesList() {
         String toPrint = "";
-        Iterator<DroneSmartCity> it = this.dronesList.iterator();
+        Iterator<DroneSmartCity> it = this.networkTopology.getDronesList().iterator();
         while(it.hasNext()) {
             DroneSmartCity dsc = it.next();
             toPrint += "(" + dsc.getId() + "," + dsc.getIp() + "," + dsc.getPort() + ")\n";

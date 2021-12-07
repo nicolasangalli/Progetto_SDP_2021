@@ -13,54 +13,53 @@ import java.util.*;
 
 public class MainDrone {
 
-    private static Drone d;
     private static io.grpc.Server server; //for gRPC call
+    private static NetworkServiceImpl networkServiceImpl; //for gRPC call
+    private static Drone d;
     private static Client client; //for REST call
     private static WebResource webResource; //for REST call
+    private static DroneSmartCity droneSmartCity; //this drone in DroneSmartCity format
+    private static String restResponse; //REST call response
+    private static Gson gson;
 
     public static void main(String[] args) {
-        //Drone initialization
+        gson = new Gson();
         Random random = new Random();
+        int serverPort = random.nextInt(1000) + 1000;
 
-        server = ServerBuilder.forPort(random.nextInt(1000) + 1000)
-                            .addService(new NetworkServiceImpl())
+        //Drone initialization
+        d = new Drone(random.nextInt(10000), serverPort, "http://localhost:8080/");
+
+        //Server gRPC initialization
+        networkServiceImpl = new NetworkServiceImpl();
+        server = ServerBuilder.forPort(serverPort)
+                            .addService(networkServiceImpl)
                             .build();
         try {
             server.start();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        System.out.println("Server started at port " + server.getPort());
+        networkServiceImpl.setD(d);
 
-        d = new Drone(random.nextInt(10000), server.getPort(), "http://localhost:8080/");
+        //REST client initialization
         client = Client.create();
         webResource = client.resource(d.getServerAmmAddress() + "drone/add");
 
-        System.out.println("Created a new drone!");
-        System.out.println("id: " + d.getId());
-        System.out.println("port: " + d.getPort());
+        System.out.println("New drone generated:");
+        System.out.println("id = " + d.getId());
+        System.out.println("port = " + d.getPort() + "\n");
+
 
         if(addToSmartCity()) { //REST call to ServerAmministratore
-            System.out.println("position: (" + d.getPosition().getX() + "," + d.getPosition().getY() + ")");
-
-            //ordering drones list (network structure)
-            Collections.sort(d.getDronesList(), new Comparator<DroneSmartCity>() {
-                @Override
-                public int compare(DroneSmartCity dsc1, DroneSmartCity dsc2) {
-                    if(dsc1.getId() > dsc2.getId()) {
-                        return 1;
-                    }
-                    if(dsc1.getId() < dsc2.getId()) {
-                        return -1;
-                    }
-                    return 0;
-                }
-            });
+            initializeNetworkTopology();
+            startThreads();
+        } else {
+            System.out.println("Shutdown...");
+            server.shutdownNow();
         }
 
-        System.out.println("Other drones in the network:");
-        System.out.println(d.printDronesList());
-
+        //Server gRPC termination
         try {
             server.awaitTermination();
         } catch (InterruptedException e) {
@@ -71,37 +70,80 @@ public class MainDrone {
     private static boolean addToSmartCity() {
         System.out.println("Try to be added to SmartCity...");
 
-        DroneSmartCity droneSmartCity = new DroneSmartCity(d.getId(), "localhost", d.getPort()); //input for REST call
+        droneSmartCity = new DroneSmartCity(d.getId(), "localhost", d.getPort()); //input for REST call
         ClientResponse response = webResource.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, droneSmartCity); //REST call
         if(response.getStatus() == Response.Status.OK.getStatusCode()) {
-            System.out.println("Successfully added to Smart City!");
-
-            String r = response.getEntity(String.class);
-            Gson gson = new Gson();
-            ArrayList<Object> respArray = gson.fromJson(r, ArrayList.class);
-            Iterator it = respArray.iterator();
-
-            //update drone position
-            int x = (int) (double) it.next();
-            int y = (int) (double) it.next();
-            Coordinate position = new Coordinate(x, y);
-            d.setPosition(position);
-
-            //set drones list
-            while(it.hasNext()) {
-                String s = it.next().toString();
-                DroneSmartCity dsc = gson.fromJson(s, DroneSmartCity.class);
-                d.getDronesList().add(dsc);
-            }
+            System.out.println("Successfully added to SmartCity!\n");
+            restResponse = response.getEntity(String.class);
             return true;
         } else {
             if(response.getStatus() == Response.Status.NOT_ACCEPTABLE.getStatusCode()) {
-                System.out.println("NOT added to Smart City: id already used!");
+                System.out.println("NOT added to SmartCity: id already used!");
             } else {
                 System.out.println("Generic error");
             }
             return false;
         }
+    }
+
+    private static void initializeNetworkTopology() {
+        ArrayList<Object> respArray = gson.fromJson(restResponse, ArrayList.class);
+        Iterator it = respArray.iterator();
+
+
+        System.out.println("Set drone position...");
+        int x = (int) (double) it.next();
+        int y = (int) (double) it.next();
+        Coordinate position = new Coordinate(x, y);
+        d.setPosition(position);
+        System.out.println("Drone position: (" + d.getPosition().getX() + "," + d.getPosition().getY() + ")\n");
+
+
+        System.out.println("Network ring generation...");
+        ArrayList<DroneSmartCity> dronesList = new ArrayList<>();
+        dronesList.add(droneSmartCity);
+        while(it.hasNext()) {
+            String s = it.next().toString();
+            DroneSmartCity dsc = gson.fromJson(s, DroneSmartCity.class);
+            dronesList.add(dsc);
+        }
+        d.getNetworkTopology().setDronesList(dronesList);
+
+        if(d.getNetworkTopology().getDronesList().size() == 1) {
+            d.setMasterId(d.getId());
+            d.setMaster(true);
+            System.out.println("Drone with id = " + d.getId() + " is the master");
+
+        } else {
+            System.out.println("Comunicate to all other drones my insertion in the network...");
+            dronesList = d.getNetworkTopology().getDronesList();
+            for(DroneSmartCity dsc : dronesList) {
+                if (dsc.getId() != d.getId()) {
+                    System.out.println("Try to communicate with drone with id = " + dsc.getId());
+                    final ManagedChannel channel = ManagedChannelBuilder.forTarget(dsc.getIp() + ":" + dsc.getPort())
+                            .usePlaintext(true)
+                            .build();
+
+                    NetworkProtoGrpc.NetworkProtoBlockingStub stub = NetworkProtoGrpc.newBlockingStub(channel);
+                    NetworkService.DroneSmartCity request = NetworkService.DroneSmartCity.newBuilder()
+                            .setId(droneSmartCity.getId())
+                            .setIp(droneSmartCity.getIp())
+                            .setPort(droneSmartCity.getPort())
+                            .build();
+                    NetworkService.Master response = stub.newDrone(request);
+                    d.setMasterId(response.getMasterId());
+                    System.out.println("Drone with id = " + dsc.getId() + " say: OK! The drone master id = " + d.getMasterId());
+                    channel.shutdownNow();
+                }
+            }
+        }
+        System.out.println("Network ring generated!\n");
+    }
+
+    private static void startThreads() {
+        Console console = new Console();
+        console.start();
+        System.out.println("Console thread started");
     }
 
 }

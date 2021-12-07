@@ -1,7 +1,8 @@
 import java.io.InputStreamReader;
 import java.util.Scanner;
 
-public class Console extends Thread{
+
+public class Console extends Thread {
 
     public void run() {
         Scanner scanner = new Scanner(new InputStreamReader(System.in));
@@ -10,6 +11,7 @@ public class Console extends Thread{
             String input = scanner.nextLine();
             if(input.trim().equalsIgnoreCase("stats")) {
             } else if(input.trim().equalsIgnoreCase("quit") || input.trim().equalsIgnoreCase("q") || input.trim().equalsIgnoreCase("exit")) {
+                System.out.println("quitting...");
                 break;
             }
         }

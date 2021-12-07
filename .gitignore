@@ -75,3 +75,5 @@ fabric.properties
 /.gradle/
 /build/
 /build/classes/java/main/
+
+.idea/codeStyles
