@@ -1,4 +1,6 @@
+import Libraries.Coordinate;
 import Libraries.Drone;
+import Libraries.Order;
 import Libraries.TopologyDrone;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
@@ -106,6 +108,32 @@ public class NetworkServiceImpl extends NetworkProtoGrpc.NetworkProtoImplBase {
 
         NetworkService.HelloResponse response = NetworkService.HelloResponse.newBuilder()
                 .setResp("elected...")
+                .build();
+        responseObserver.onNext(response);
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    public void freeDrone(NetworkService.HelloRequest request, StreamObserver<NetworkService.DroneDeliveryInfo> responseObserver) {
+        NetworkService.DroneDeliveryInfo response = NetworkService.DroneDeliveryInfo.newBuilder()
+                .setId(d.getId())
+                .setDelivery(d.getDelivering())
+                .setX(d.getPosition().getX())
+                .setY(d.getPosition().getY())
+                .setBattery(d.getBattery())
+                .build();
+        responseObserver.onNext(response);
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    public void deliverOrder(NetworkService.Order request, StreamObserver<NetworkService.HelloResponse> responseObserver) {
+        Order order = new Order(request.getOrderId(), new Coordinate(-1, -1), new Coordinate(request.getX(), request.getY()));
+        Delivery delivery = new Delivery(d, order);
+        delivery.start();
+
+        NetworkService.HelloResponse response = NetworkService.HelloResponse.newBuilder()
+                .setResp("online")
                 .build();
         responseObserver.onNext(response);
         responseObserver.onCompleted();

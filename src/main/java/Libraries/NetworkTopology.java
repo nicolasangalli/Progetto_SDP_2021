@@ -22,6 +22,15 @@ public class NetworkTopology {
         orderDroneList();
     }
 
+    public TopologyDrone getDroneWithId(int id) {
+        for(TopologyDrone td : dronesList) {
+            if(td.getId() == id) {
+                return td;
+            }
+        }
+        return null;
+    }
+
     public void addNewDrone(TopologyDrone d) {
         dronesList.add(d);
         orderDroneList();
