@@ -1,15 +1,28 @@
 service NetworkProto {
-    rpc NewDrone(DroneSmartCity) returns(Master) {};
+    rpc AddNewDrone(NewDrone) returns(Master) {};
+    rpc Greeting(HelloRequest) returns(HelloResponse) {};
+    rpc Election(ElectionId) returns(HelloResponse) {};
+    rpc Elected(ElectionId) returns(HelloResponse) {};
 }
 
-message DroneSmartCity {
+message NewDrone {
     required int32 id = 1;
     required string ip = 2;
     required int32 port = 3;
-    required int32 x = 4;
-    required int32 y = 5;
 }
 
 message Master {
     required int32 masterId = 1;
+}
+
+message HelloRequest {
+    required int32 id = 1;
+}
+
+message HelloResponse {
+    optional string resp = 1;
+}
+
+message ElectionId {
+    required int32 id = 1;
 }

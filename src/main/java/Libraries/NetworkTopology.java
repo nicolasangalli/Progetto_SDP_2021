@@ -66,10 +66,18 @@ public class NetworkTopology {
 
     public TopologyDrone getNextDrone(Drone d) {
         if(dronesList.size() <= 1) {
-            return null;
+            return dronesList.get(0);
         }
-        TopologyDrone td = new TopologyDrone(d.getId(), d.getIp(), d.getPort());
-        int index = dronesList.indexOf(td);
+
+        int index = 0;
+        for(TopologyDrone td : dronesList) {
+            if(dronesList.get(index).getId() != d.getId()) {
+                index++;
+            } else {
+                break;
+            }
+        }
+
         if(index == dronesList.size()-1) {
             index = 0;
         } else {
@@ -78,14 +86,13 @@ public class NetworkTopology {
         return dronesList.get(index);
     }
 
-    /*
     public String getNetworkDrones() {
         String ret = "Drones in the network:\n";
-        for (Drone d : dronesList) {
-            ret += "(" + d.getId() + ", ip: " + d.getIp() + ", port: " + d.getPort() + ", position: (" + d.getPosition().getX() + "," + d.getPosition().getY() + "))\n";
+        for (TopologyDrone d : dronesList) {
+            ret += "(" + d.getId() + ", ip: " + d.getIp() + ", port: " + d.getPort() + ")\n";
         }
         return ret;
-    }*/
+    }
 
     public void removeDrone(TopologyDrone d) {
         dronesList.remove(d);
