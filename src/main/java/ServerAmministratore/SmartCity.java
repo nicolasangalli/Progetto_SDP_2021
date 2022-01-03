@@ -1,7 +1,7 @@
 package ServerAmministratore;
 
 import Libraries.Coordinate;
-import Libraries.DroneSmartCity;
+import Libraries.Drone;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.util.ArrayList;
 import java.util.Random;
@@ -11,7 +11,7 @@ import java.util.Random;
 public class SmartCity {
 
     private static SmartCity instance;
-    private ArrayList<DroneSmartCity> drones;
+    private ArrayList<Drone> drones;
 
     private SmartCity() {
         drones = new ArrayList<>();
@@ -25,8 +25,8 @@ public class SmartCity {
     }
 
     public synchronized boolean checkAvailable(int id) {
-        for(DroneSmartCity drone : drones) {
-            if(drone.getId() == id) {
+        for(Drone d : drones) {
+            if(d.getId() == id) {
                 return false;
             }
         }
@@ -34,8 +34,8 @@ public class SmartCity {
     }
 
     //Add drone with id to SmartCity and return the position that it should be placed
-    public synchronized Coordinate addNewDrone(DroneSmartCity drone) {
-        drones.add(drone);
+    public synchronized Coordinate addNewDrone(Drone d) {
+        drones.add(d);
 
         //generate random position
         Random random = new Random();
@@ -46,14 +46,14 @@ public class SmartCity {
 
     //return a list with the position of drone and all the other drones
     public ArrayList<Object> getDrones(int id, int x, int y) {
-        ArrayList<DroneSmartCity> list = drones;
+        ArrayList<Drone> list = drones;
         ArrayList<Object> ret = new ArrayList<>();
 
         ret.add(x);
         ret.add(y);
-        for(DroneSmartCity drone : list) {
-            if(drone.getId() != id) {
-                ret.add(drone);
+        for(Drone d : list) {
+            if(d.getId() != id) {
+                ret.add(d);
             }
         }
 
@@ -61,17 +61,17 @@ public class SmartCity {
     }
 
     public synchronized void removeDrone(int id) {
-        for(DroneSmartCity drone : drones) {
-            if(drone.getId() == id) {
-                drones.remove(drone);
+        for(Drone d : drones) {
+            if(d.getId() == id) {
+                drones.remove(d);
                 break;
             }
         }
     }
 
     //return the drones list
-    public ArrayList<DroneSmartCity> getStats() {
-        ArrayList<DroneSmartCity> list = drones;
+    public ArrayList<Drone> getStats() {
+        ArrayList<Drone> list = drones;
         return list;
     }
 
