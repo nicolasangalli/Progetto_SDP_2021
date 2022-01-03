@@ -44,12 +44,48 @@ public class NetworkTopology {
         }
     }
 
+    public DroneSmartCity getNextDrone(DroneSmartCity droneSmartCity) {
+        if(dronesList.size() <= 1) {
+            return null;
+        }
+        int index = dronesList.indexOf(droneSmartCity);
+        if(index == dronesList.size()-1) {
+            index = 0;
+        } else {
+            index++;
+        }
+        return dronesList.get(index);
+    }
+
+    public DroneSmartCity getNextDrone(Drone d) {
+        if(dronesList.size() <= 1) {
+            return null;
+        }
+        int index = 0;
+        for(DroneSmartCity dsc : dronesList) {
+            if(dsc.getId() == d.getId()) {
+                index = dronesList.indexOf(dsc);
+                break;
+            }
+        }
+        if(index == dronesList.size()-1) {
+            index = 0;
+        } else {
+            index++;
+        }
+        return dronesList.get(index);
+    }
+
     public String getNetworkDrones() {
         String ret = "Drones in the network:\n";
         for (DroneSmartCity dsc : dronesList) {
             ret += "(" + dsc.getId() + ", ip: " + dsc.getIp() + ", port: " + dsc.getPort() + ", position: (" + dsc.getPosition().getX() + "," + dsc.getPosition().getY() + "))\n";
         }
         return ret;
+    }
+
+    public void removeDrone(DroneSmartCity droneSmartCity) {
+        dronesList.remove(droneSmartCity);
     }
 
 }
