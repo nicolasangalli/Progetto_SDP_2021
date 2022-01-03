@@ -28,7 +28,7 @@ public class NetworkTopology {
     }
 
     public void addNewDrone(Drone d) {
-        TopologyDrone td = new TopologyDrone(d.getId(), d.getIp(), d.getPort(), d.getServerAmmAddress());
+        TopologyDrone td = new TopologyDrone(d.getId(), d.getIp(), d.getPort());
         dronesList.add(td);
         orderDroneList();
     }
@@ -68,7 +68,7 @@ public class NetworkTopology {
         if(dronesList.size() <= 1) {
             return null;
         }
-        TopologyDrone td = new TopologyDrone(d.getId(), d.getIp(), d.getPort(), d.getServerAmmAddress());
+        TopologyDrone td = new TopologyDrone(d.getId(), d.getIp(), d.getPort());
         int index = dronesList.indexOf(td);
         if(index == dronesList.size()-1) {
             index = 0;
