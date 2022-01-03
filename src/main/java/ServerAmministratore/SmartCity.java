@@ -1,7 +1,7 @@
 package ServerAmministratore;
 
 import Libraries.Coordinate;
-import Libraries.Drone;
+import Libraries.TopologyDrone;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.util.ArrayList;
 import java.util.Random;
@@ -11,7 +11,7 @@ import java.util.Random;
 public class SmartCity {
 
     private static SmartCity instance;
-    private ArrayList<Drone> drones;
+    private ArrayList<TopologyDrone> drones;
 
     private SmartCity() {
         drones = new ArrayList<>();
@@ -25,7 +25,7 @@ public class SmartCity {
     }
 
     public synchronized boolean checkAvailable(int id) {
-        for(Drone d : drones) {
+        for(TopologyDrone d : drones) {
             if(d.getId() == id) {
                 return false;
             }
@@ -33,25 +33,23 @@ public class SmartCity {
         return true;
     }
 
-    //Add drone with id to SmartCity and return the position that it should be placed
-    public synchronized Coordinate addNewDrone(Drone d) {
+    public synchronized Coordinate addNewDrone(TopologyDrone d) {
         drones.add(d);
 
         //generate random position
         Random random = new Random();
         Coordinate position = new Coordinate(random.nextInt(10), random.nextInt(10));
-
         return position;
     }
 
     //return a list with the position of drone and all the other drones
     public ArrayList<Object> getDrones(int id, int x, int y) {
-        ArrayList<Drone> list = drones;
+        ArrayList<TopologyDrone> list = drones;
         ArrayList<Object> ret = new ArrayList<>();
 
         ret.add(x);
         ret.add(y);
-        for(Drone d : list) {
+        for(TopologyDrone d : list) {
             if(d.getId() != id) {
                 ret.add(d);
             }
@@ -61,7 +59,7 @@ public class SmartCity {
     }
 
     public synchronized void removeDrone(int id) {
-        for(Drone d : drones) {
+        for(TopologyDrone d : drones) {
             if(d.getId() == id) {
                 drones.remove(d);
                 break;
@@ -70,8 +68,8 @@ public class SmartCity {
     }
 
     //return the drones list
-    public ArrayList<Drone> getStats() {
-        ArrayList<Drone> list = drones;
+    public ArrayList<TopologyDrone> getStats() {
+        ArrayList<TopologyDrone> list = drones;
         return list;
     }
 

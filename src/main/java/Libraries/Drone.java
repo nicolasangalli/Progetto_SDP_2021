@@ -21,7 +21,7 @@ public class Drone {
     //Chang and Roberts
     private boolean participant;
 
-    //consegne
+    //Delivery
     private ArrayList<Order> ordersList;
     private boolean delivering;
 

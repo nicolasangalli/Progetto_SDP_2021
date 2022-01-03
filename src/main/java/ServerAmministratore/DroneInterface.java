@@ -2,6 +2,7 @@ package ServerAmministratore;
 
 import Libraries.Coordinate;
 import Libraries.Drone;
+import Libraries.TopologyDrone;
 import com.google.gson.Gson;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -19,9 +20,9 @@ public class DroneInterface {
         System.out.println("Drone " + d.getId() + " ask to be added to SmartCity...");
 
         if(SmartCity.getInstance().checkAvailable(d.getId())) {
-            //add drone to SmartCity
-            Coordinate position = SmartCity.getInstance().addNewDrone(d);
-            System.out.println("Drone " + d.getId() + " added to SmartCity!");
+            TopologyDrone td = new TopologyDrone(d.getId(), d.getIp(), d.getPort(), d.getServerAmmAddress());
+            Coordinate position = SmartCity.getInstance().addNewDrone(td);
+            System.out.println("Drone " + td.getId() + " added to SmartCity!");
 
             //return the position and the other drones in SmartCity
             ArrayList<Object> retList = SmartCity.getInstance().getDrones(d.getId(), position.getX(), position.getY());
@@ -58,7 +59,7 @@ public class DroneInterface {
     public Response getStats() {
         System.out.println("Drone master requested stats...");
 
-        ArrayList<Drone> retList = SmartCity.getInstance().getStats();
+        ArrayList<TopologyDrone> retList = SmartCity.getInstance().getStats();
         Gson gson = new Gson();
         String resp = gson.toJson(retList);
         return Response.ok(resp).build();
