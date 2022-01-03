@@ -1,5 +1,4 @@
-package Libraries;
-
+import Libraries.DroneSmartCity;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -7,35 +6,35 @@ import java.util.Comparator;
 
 public class NetworkTopology {
 
-    private ArrayList<Drone> dronesList;
+    private ArrayList<DroneSmartCity> dronesList;
 
     public NetworkTopology() {
         dronesList = new ArrayList<>();
     }
 
-    public ArrayList<Drone> getDronesList() {
+    public ArrayList<DroneSmartCity> getDronesList() {
         return dronesList;
     }
 
-    public void setDronesList(ArrayList<Drone> dronesList) {
+    public void setDronesList(ArrayList<DroneSmartCity> dronesList) {
         this.dronesList = dronesList;
         orderDroneList();
     }
 
-    public void addNewDrone(Drone d) {
-        dronesList.add(d);
+    public void addNewDrone(DroneSmartCity droneSmartCity) {
+        dronesList.add(droneSmartCity);
         orderDroneList();
     }
 
     private void orderDroneList() {
         if(dronesList.size() > 1) {
-            Collections.sort(dronesList, new Comparator<Drone>() {
+            Collections.sort(dronesList, new Comparator<DroneSmartCity>() {
                 @Override
-                public int compare(Drone d1, Drone d2) {
-                    if (d1.getId() > d2.getId()) {
+                public int compare(DroneSmartCity dsc1, DroneSmartCity dsc2) {
+                    if (dsc1.getId() > dsc2.getId()) {
                         return 1;
                     }
-                    if (d1.getId() < d2.getId()) {
+                    if (dsc1.getId() < dsc2.getId()) {
                         return -1;
                     }
                     return 0;
@@ -45,11 +44,30 @@ public class NetworkTopology {
         }
     }
 
-    public Drone getNextDrone(Drone d) {
+    public DroneSmartCity getNextDrone(DroneSmartCity droneSmartCity) {
         if(dronesList.size() <= 1) {
             return null;
         }
-        int index = dronesList.indexOf(d);
+        int index = dronesList.indexOf(droneSmartCity);
+        if(index == dronesList.size()-1) {
+            index = 0;
+        } else {
+            index++;
+        }
+        return dronesList.get(index);
+    }
+
+    public DroneSmartCity getNextDrone(Drone d) {
+        if(dronesList.size() <= 1) {
+            return null;
+        }
+        int index = 0;
+        for(DroneSmartCity dsc : dronesList) {
+            if(dsc.getId() == d.getId()) {
+                index = dronesList.indexOf(dsc);
+                break;
+            }
+        }
         if(index == dronesList.size()-1) {
             index = 0;
         } else {
@@ -60,14 +78,14 @@ public class NetworkTopology {
 
     public String getNetworkDrones() {
         String ret = "Drones in the network:\n";
-        for (Drone d : dronesList) {
-            ret += "(" + d.getId() + ", ip: " + d.getIp() + ", port: " + d.getPort() + ", position: (" + d.getPosition().getX() + "," + d.getPosition().getY() + "))\n";
+        for (DroneSmartCity dsc : dronesList) {
+            ret += "(" + dsc.getId() + ", ip: " + dsc.getIp() + ", port: " + dsc.getPort() + ", position: (" + dsc.getPosition().getX() + "," + dsc.getPosition().getY() + "))\n";
         }
         return ret;
     }
 
-    public void removeDrone(Drone d) {
-        dronesList.remove(d);
+    public void removeDrone(DroneSmartCity droneSmartCity) {
+        dronesList.remove(droneSmartCity);
     }
 
 }
