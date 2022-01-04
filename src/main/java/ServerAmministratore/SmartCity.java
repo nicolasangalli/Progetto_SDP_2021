@@ -34,11 +34,13 @@ public class SmartCity {
     }
 
     public synchronized Coordinate addNewDrone(TopologyDrone d) {
-        drones.add(d);
-
         //generate random position
         Random random = new Random();
         Coordinate position = new Coordinate(random.nextInt(10), random.nextInt(10));
+
+        d.setPosition(position);
+        drones.add(d);
+
         return position;
     }
 

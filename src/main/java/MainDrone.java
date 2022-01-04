@@ -99,7 +99,7 @@ public class MainDrone {
 
         System.out.println("Network ring generation...");
         ArrayList<TopologyDrone> dronesList = new ArrayList<>();
-        dronesList.add(new TopologyDrone(d.getId(), d.getIp(), d.getPort()));
+        dronesList.add(new TopologyDrone(d.getId(), d.getIp(), d.getPort(), d.getPosition()));
         while(it.hasNext()) {
             String s = it.next().toString();
             TopologyDrone otherDrone = gson.fromJson(s, TopologyDrone.class);
@@ -126,6 +126,8 @@ public class MainDrone {
                             .setId(d.getId())
                             .setIp(d.getIp())
                             .setPort(d.getPort())
+                            .setX(d.getPosition().getX())
+                            .setY(d.getPosition().getY())
                             .build();
                     NetworkService.Master response = stub.addNewDrone(request);
                     d.setMasterId(response.getMasterId());

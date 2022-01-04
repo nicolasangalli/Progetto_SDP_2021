@@ -13,7 +13,7 @@ public class NetworkServiceImpl extends NetworkProtoGrpc.NetworkProtoImplBase {
 
     @Override
     public void addNewDrone(NetworkService.NewDrone request, StreamObserver<NetworkService.Master> responseObserver) {
-        TopologyDrone otherDrone = new TopologyDrone(request.getId(), request.getIp(), request.getPort());
+        TopologyDrone otherDrone = new TopologyDrone(request.getId(), request.getIp(), request.getPort(), new Coordinate(request.getX(), request.getY()));
         d.getNetworkTopology().addNewDrone(otherDrone);
 
         NetworkService.Master response = NetworkService.Master.newBuilder()

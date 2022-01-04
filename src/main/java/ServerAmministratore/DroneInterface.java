@@ -20,7 +20,7 @@ public class DroneInterface {
         System.out.println("Drone " + d.getId() + " ask to be added to SmartCity...");
 
         if(SmartCity.getInstance().checkAvailable(d.getId())) {
-            TopologyDrone td = new TopologyDrone(d.getId(), d.getIp(), d.getPort());
+            TopologyDrone td = new TopologyDrone(d.getId(), d.getIp(), d.getPort(), d.getPosition());
             Coordinate position = SmartCity.getInstance().addNewDrone(td);
             System.out.println("Drone " + td.getId() + " added to SmartCity!");
 

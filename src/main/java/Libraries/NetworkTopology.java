@@ -37,7 +37,7 @@ public class NetworkTopology {
     }
 
     public void addNewDrone(Drone d) {
-        TopologyDrone td = new TopologyDrone(d.getId(), d.getIp(), d.getPort());
+        TopologyDrone td = new TopologyDrone(d.getId(), d.getIp(), d.getPort(), d.getPosition());
         dronesList.add(td);
         orderDroneList();
     }
@@ -98,7 +98,7 @@ public class NetworkTopology {
     public String getNetworkDrones() {
         String ret = "Drones in the network:\n";
         for (TopologyDrone d : dronesList) {
-            ret += "(" + d.getId() + ", ip: " + d.getIp() + ", port: " + d.getPort() + ")\n";
+            ret += "(" + d.getId() + ", ip: " + d.getIp() + ", port: " + d.getPort() + ", pos:("+ d.getPosition().getX() + "," + d.getPosition().getY() + "))\n";
         }
         return ret;
     }

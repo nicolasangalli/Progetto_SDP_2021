@@ -9,13 +9,15 @@ public class TopologyDrone {
     private int id;
     private String ip;
     private int port;
+    private Coordinate position;
 
     public TopologyDrone() {}
 
-    public TopologyDrone(int id, String ip, int port) {
+    public TopologyDrone(int id, String ip, int port, Coordinate position) {
         this.id = id;
         this.ip = ip;
         this.port = port;
+        this.position = position;
     }
 
     public int getId() {
@@ -40,6 +42,14 @@ public class TopologyDrone {
 
     public void setPort(int port) {
         this.port = port;
+    }
+
+    public Coordinate getPosition() {
+        return position;
+    }
+
+    public void setPosition(Coordinate position) {
+        this.position = position;
     }
 
 }
