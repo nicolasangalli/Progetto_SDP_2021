@@ -142,8 +142,10 @@ public class MainDrone {
     private static void startThreads() {
 
         //debug
+        //Random random = new Random();
         d.setMaster(false);
         d.setMasterId(-1);
+        //d.setBattery(random.nextInt(100));
 
         Console console = new Console(d);
         console.start();

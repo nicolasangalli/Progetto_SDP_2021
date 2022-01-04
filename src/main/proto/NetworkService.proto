@@ -1,8 +1,8 @@
 service NetworkProto {
     rpc AddNewDrone(NewDrone) returns(Master) {};
     rpc Greeting(HelloRequest) returns(HelloResponse) {};
-    rpc Election(ElectionId) returns(HelloResponse) {};
-    rpc Elected(ElectionId) returns(HelloResponse) {};
+    rpc Election(ElectionMsg) returns(HelloResponse) {};
+    rpc Elected(ElectionMsg) returns(HelloResponse) {};
     rpc FreeDrone(HelloRequest) returns(DroneDeliveryInfo) {};
     rpc DeliverOrder(Order) returns(HelloResponse) {};
 }
@@ -27,8 +27,9 @@ message HelloResponse {
     optional string resp = 1;
 }
 
-message ElectionId {
+message ElectionMsg {
     required int32 id = 1;
+    optional int32 battery = 2;
 }
 
 message DroneDeliveryInfo {

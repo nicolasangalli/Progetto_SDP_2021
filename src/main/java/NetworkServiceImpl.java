@@ -33,9 +33,11 @@ public class NetworkServiceImpl extends NetworkProtoGrpc.NetworkProtoImplBase {
     }
 
     @Override
-    public void election(NetworkService.ElectionId request, StreamObserver<NetworkService.HelloResponse> responseObserver) {
+    public void election(NetworkService.ElectionMsg request, StreamObserver<NetworkService.HelloResponse> responseObserver) {
         int id = request.getId();
-        if(id > d.getId()) {
+        int battery = request.getBattery();
+
+        if(battery > d.getBattery() || (battery == d.getBattery() && id > d.getId())) {
             d.setParticipant(true);
 
             TopologyDrone nextDrone = d.getNetworkTopology().getNextDrone(d);
@@ -43,12 +45,13 @@ public class NetworkServiceImpl extends NetworkProtoGrpc.NetworkProtoImplBase {
                     .usePlaintext(true)
                     .build();
             NetworkProtoGrpc.NetworkProtoBlockingStub stub = NetworkProtoGrpc.newBlockingStub(channel);
-            NetworkService.ElectionId req = NetworkService.ElectionId.newBuilder()
+            NetworkService.ElectionMsg req = NetworkService.ElectionMsg.newBuilder()
                     .setId(id)
+                    .setBattery(battery)
                     .build();
             stub.election(req);
             channel.shutdownNow();
-        } else if(id < d.getId()) {
+        } else if(battery < d.getBattery() || (battery == d.getBattery() && id < d.getId())) {
             if(d.getParticipant() == false) {
                 d.setParticipant(true);
 
@@ -57,8 +60,9 @@ public class NetworkServiceImpl extends NetworkProtoGrpc.NetworkProtoImplBase {
                         .usePlaintext(true)
                         .build();
                 NetworkProtoGrpc.NetworkProtoBlockingStub stub = NetworkProtoGrpc.newBlockingStub(channel);
-                NetworkService.ElectionId req = NetworkService.ElectionId.newBuilder()
+                NetworkService.ElectionMsg req = NetworkService.ElectionMsg.newBuilder()
                         .setId(d.getId())
+                        .setBattery(d.getBattery())
                         .build();
                 stub.election(req);
                 channel.shutdownNow();
@@ -73,7 +77,7 @@ public class NetworkServiceImpl extends NetworkProtoGrpc.NetworkProtoImplBase {
                     .usePlaintext(true)
                     .build();
             NetworkProtoGrpc.NetworkProtoBlockingStub stub = NetworkProtoGrpc.newBlockingStub(channel);
-            NetworkService.ElectionId req = NetworkService.ElectionId.newBuilder()
+            NetworkService.ElectionMsg req = NetworkService.ElectionMsg.newBuilder()
                     .setId(d.getId())
                     .build();
             stub.elected(req);
@@ -88,7 +92,7 @@ public class NetworkServiceImpl extends NetworkProtoGrpc.NetworkProtoImplBase {
     }
 
     @Override
-    public void elected(NetworkService.ElectionId request, StreamObserver<NetworkService.HelloResponse> responseObserver) {
+    public void elected(NetworkService.ElectionMsg request, StreamObserver<NetworkService.HelloResponse> responseObserver) {
         int id = request.getId();
         d.setParticipant(false);
         d.setMasterId(id);
@@ -99,7 +103,7 @@ public class NetworkServiceImpl extends NetworkProtoGrpc.NetworkProtoImplBase {
                     .usePlaintext(true)
                     .build();
             NetworkProtoGrpc.NetworkProtoBlockingStub stub = NetworkProtoGrpc.newBlockingStub(channel);
-            NetworkService.ElectionId req = NetworkService.ElectionId.newBuilder()
+            NetworkService.ElectionMsg req = NetworkService.ElectionMsg.newBuilder()
                     .setId(id)
                     .build();
             stub.elected(req);

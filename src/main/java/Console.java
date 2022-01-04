@@ -49,8 +49,9 @@ public class Console extends Thread {
                 .build();
 
         NetworkProtoGrpc.NetworkProtoBlockingStub stub = NetworkProtoGrpc.newBlockingStub(channel);
-        NetworkService.ElectionId request = NetworkService.ElectionId.newBuilder()
+        NetworkService.ElectionMsg request = NetworkService.ElectionMsg.newBuilder()
                 .setId(d.getId())
+                .setBattery(d.getBattery())
                 .build();
         stub.election(request);
         channel.shutdownNow();
