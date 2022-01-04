@@ -60,6 +60,7 @@ public class Delivery extends Thread {
                     .setId(d.getId())
                     .setX(d.getPosition().getX())
                     .setY(d.getPosition().getY())
+                    .setNOrders(d.getnOrders())
                     .setDistance(d.getCoveredDistance())
                     .setBattery(d.getBattery())
                     .build();

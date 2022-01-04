@@ -111,6 +111,9 @@ public class MainDrone {
             d.setMasterId(d.getId());
             d.setMaster(true);
             System.out.println("This drone is the only one in the network, elected as master");
+
+            MQTTSubscription mqttSubscription = new MQTTSubscription(d);
+            mqttSubscription.start();
         } else {
             System.out.println("Comunicate to all other drones my insertion in the network...");
             dronesList = d.getNetworkTopology().getDronesList();
@@ -143,8 +146,8 @@ public class MainDrone {
 
         //debug
         //Random random = new Random();
-        d.setMaster(false);
-        d.setMasterId(-1);
+        //d.setMaster(false);
+        //d.setMasterId(-1);
         //d.setBattery(random.nextInt(100));
 
         Console console = new Console(d);
