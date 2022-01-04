@@ -1,22 +1,23 @@
 package Sensor;
 
+import Libraries.Drone;
 import java.util.ArrayList;
 import java.util.List;
-import static Sensor.MainSensor.avg;
 
 
 public class MeasurementBuffer implements Buffer {
 
+    private Drone d;
     private List<Measurement> list;
 
-    public MeasurementBuffer() {
+    public MeasurementBuffer(Drone d) {
+        this.d = d;
         list = new ArrayList<Measurement>();
     }
 
     @Override
     public void addMeasurement(Measurement m) {
         list.add(m);
-        System.out.println(m.getValue() + " - " + m.getTimestamp());
         if(list.size() == 8) {
             list = readAllAndClean();
         }
@@ -28,8 +29,7 @@ public class MeasurementBuffer implements Buffer {
         for(Measurement m: list) {
             sum += m.getValue();
         }
-        avg = sum/8;
-        System.out.println(avg);
+        d.setPollutionLevel(Math.round(sum/8*100.0)/100.0);
         for(int i=0; i<4; i++) {
             list.remove(i);
         }

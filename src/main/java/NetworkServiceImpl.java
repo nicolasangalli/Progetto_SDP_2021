@@ -178,7 +178,16 @@ public class NetworkServiceImpl extends NetworkProtoGrpc.NetworkProtoImplBase {
 
     @Override
     public void deliverStats(NetworkService.DroneStats request, StreamObserver<NetworkService.HelloResponse> responseObserver) {
+        d.getAvgOrder().add(request.getNOrders());
+        d.getAvgKm().add(request.getDistance());
+        d.getAvgPollution().add(request.getPollutionLevel());
+        d.getAvgBattery().add(request.getBattery());
 
+        NetworkService.HelloResponse response = NetworkService.HelloResponse.newBuilder()
+                .setResp("online")
+                .build();
+        responseObserver.onNext(response);
+        responseObserver.onCompleted();
     }
 
     public Drone getD() {

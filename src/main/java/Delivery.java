@@ -62,10 +62,16 @@ public class Delivery extends Thread {
                     .setY(d.getPosition().getY())
                     .setNOrders(d.getnOrders())
                     .setDistance(d.getCoveredDistance())
+                    .setPollutionLevel(d.getPollutionLevel())
                     .setBattery(d.getBattery())
                     .build();
             stub.deliverStats(request);
             channel.shutdownNow();
+        } else {
+            d.getAvgOrder().add(d.getnOrders());
+            d.getAvgKm().add(d.getCoveredDistance());
+            d.getAvgPollution().add(d.getPollutionLevel());
+            d.getAvgBattery().add(d.getBattery());
         }
 
     }

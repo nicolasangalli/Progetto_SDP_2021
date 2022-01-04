@@ -26,6 +26,13 @@ public class Drone {
     private boolean delivering;
     private int nOrders;
     private int coveredDistance;
+    private double pollutionLevel;
+
+    //Global stats
+    private ArrayList<Integer> avgOrder;
+    private ArrayList<Integer> avgKm;
+    private ArrayList<Double> avgPollution;
+    private ArrayList<Integer> avgBattery;
 
     public Drone() {}
 
@@ -47,6 +54,11 @@ public class Drone {
         delivering = false;
         nOrders = 0;
         coveredDistance = 0;
+
+        avgOrder = new ArrayList<>();
+        avgKm = new ArrayList<>();
+        avgPollution = new ArrayList<>();
+        avgBattery = new ArrayList<>();
     }
 
     public int getId() {
@@ -161,8 +173,48 @@ public class Drone {
         this.coveredDistance = coveredDistance;
     }
 
+    public double getPollutionLevel() {
+        return pollutionLevel;
+    }
+
+    public void setPollutionLevel(double pollutionLevel) {
+        this.pollutionLevel = pollutionLevel;
+    }
+
+    public ArrayList<Integer> getAvgOrder() {
+        return avgOrder;
+    }
+
+    public void setAvgOrder(ArrayList<Integer> avgOrder) {
+        this.avgOrder = avgOrder;
+    }
+
+    public ArrayList<Integer> getAvgKm() {
+        return avgKm;
+    }
+
+    public void setAvgKm(ArrayList<Integer> avgKm) {
+        this.avgKm = avgKm;
+    }
+
+    public ArrayList<Double> getAvgPollution() {
+        return avgPollution;
+    }
+
+    public void setAvgPollution(ArrayList<Double> avgPollution) {
+        this.avgPollution = avgPollution;
+    }
+
+    public ArrayList<Integer> getAvgBattery() {
+        return avgBattery;
+    }
+
+    public void setAvgBattery(ArrayList<Integer> avgBattery) {
+        this.avgBattery = avgBattery;
+    }
+
     public String getStatus() {
-        String status = "id: " + this.id + "\nport: " + this.port + "\nmaster: " + this.master + "\nmaster id: " + this.masterId + "\nbattery level: " + this.battery + "%\nposition: (" + this.position.getX() + "," + this.position.getY() + ")\nnOrders: " + this.nOrders + "\ncovered distance: " + this.coveredDistance + "\n";
+        String status = "id: " + this.id + "\nport: " + this.port + "\nmaster: " + this.master + "\nmaster id: " + this.masterId + "\nbattery level: " + this.battery + "%\nposition: (" + this.position.getX() + "," + this.position.getY() + ")\nnOrders: " + this.nOrders + "\ncovered distance: " + this.coveredDistance + "\npollution level: " + this.pollutionLevel + "\n";
         return status;
     }
 

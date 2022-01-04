@@ -1,6 +1,5 @@
-package Other;
-
 import Libraries.Drone;
+import Libraries.TopologyDrone;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 
@@ -8,11 +7,9 @@ import io.grpc.ManagedChannelBuilder;
 public class NetworkChecker extends Thread {
 
     private Drone d;
-    private DroneSmartCity dsc;
 
-    public NetworkChecker(Drone d, DroneSmartCity dsc) {
+    public NetworkChecker(Drone d) {
         this.d = d;
-        this.dsc = dsc;
     }
 
     public void run() {
@@ -22,27 +19,24 @@ public class NetworkChecker extends Thread {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            DroneSmartCity nextDrone = d.getNetworkTopology().getNextDrone(dsc);
-            if(nextDrone != null) {
+
+            if(d.getNetworkTopology().getDronesList().size() > 1) {
+                TopologyDrone nextDrone = d.getNetworkTopology().getNextDrone(d);
+                System.out.println("Check if the next drone is online");
                 final ManagedChannel channel = ManagedChannelBuilder.forTarget(nextDrone.getIp() + ":" + nextDrone.getPort())
                         .usePlaintext(true)
                         .build();
+
                 NetworkProtoGrpc.NetworkProtoBlockingStub stub = NetworkProtoGrpc.newBlockingStub(channel);
                 NetworkService.HelloRequest request = NetworkService.HelloRequest.newBuilder()
                         .setId(d.getId())
                         .build();
-                try {
-                    NetworkService.HelloResponse response = stub.greeting(request);
-                } catch (Exception e) {
-                    d.getNetworkTopology().removeDrone(nextDrone);
-
-                    //comunico a tutti i nodi della rete di rimuovere nextDrone;
-
-                    if(nextDrone.getId() == d.getMasterId()) {
-                        //elezione nuovo master, metto in pausa il thread
-                    }
+                NetworkService.HelloResponse response = stub.greeting(request);
+                if (response.getResp().equalsIgnoreCase("online")) {
+                    System.out.println("ok");
+                } else {
+                    System.out.println("not reachable");
                 }
-
                 channel.shutdownNow();
             }
         }

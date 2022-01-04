@@ -1,6 +1,8 @@
 import Libraries.Coordinate;
 import Libraries.Drone;
 import Libraries.TopologyDrone;
+import Sensor.MeasurementBuffer;
+import Sensor.PM10Simulator;
 import com.google.gson.Gson;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
@@ -111,9 +113,6 @@ public class MainDrone {
             d.setMasterId(d.getId());
             d.setMaster(true);
             System.out.println("This drone is the only one in the network, elected as master");
-
-            MQTTSubscription mqttSubscription = new MQTTSubscription(d);
-            mqttSubscription.start();
         } else {
             System.out.println("Comunicate to all other drones my insertion in the network...");
             dronesList = d.getNetworkTopology().getDronesList();
@@ -153,13 +152,21 @@ public class MainDrone {
         Console console = new Console(d);
         console.start();
         System.out.println("Console thread started");
+        //NetworkChecker networkChecker = new NetworkChecker(d);
+        //networkChecker.start();
+        //System.out.println("Network checker thread started");
 
-        /*
+        MeasurementBuffer myBuffer = new MeasurementBuffer(d);
+        PM10Simulator pm10Simulator = new PM10Simulator(myBuffer);
+        pm10Simulator.start();
+
         if(d.getMaster()) {
             MQTTSubscription mqttSubscription = new MQTTSubscription(d);
             mqttSubscription.start();
-            System.out.println("MQTT thread started");
-        }*/
+
+            SendGlobalStats sendGlobalStats = new SendGlobalStats(d);
+            sendGlobalStats.start();
+        }
 
     }
 

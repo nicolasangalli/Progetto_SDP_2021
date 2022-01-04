@@ -63,5 +63,6 @@ message DroneStats {
     required int32 y = 4;
     required int32 nOrders = 5;
     required int32 distance = 6;
-    required int32 battery = 7;
+    required double pollutionLevel = 7;
+    required int32 battery = 8;
 }
