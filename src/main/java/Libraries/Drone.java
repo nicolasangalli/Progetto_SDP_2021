@@ -24,6 +24,8 @@ public class Drone {
     //Delivery
     private ArrayList<Order> ordersList;
     private boolean delivering;
+    private int nOrders;
+    private int coveredDistance;
 
     public Drone() {}
 
@@ -43,6 +45,8 @@ public class Drone {
 
         ordersList = new ArrayList<>();
         delivering = false;
+        nOrders = 0;
+        coveredDistance = 0;
     }
 
     public int getId() {
@@ -141,8 +145,24 @@ public class Drone {
         this.delivering = delivering;
     }
 
+    public int getnOrders() {
+        return nOrders;
+    }
+
+    public void setnOrders(int nOrders) {
+        this.nOrders = nOrders;
+    }
+
+    public int getCoveredDistance() {
+        return coveredDistance;
+    }
+
+    public void setCoveredDistance(int coveredDistance) {
+        this.coveredDistance = coveredDistance;
+    }
+
     public String getStatus() {
-        String status = "id: " + this.id + "\nport: " + this.port + "\nmaster: " + this.master + "\nmaster id: " + this.masterId + "\nbattery level: " + this.battery + "%\nposition: (" + this.position.getX() + "," + this.position.getY() + ")\n";
+        String status = "id: " + this.id + "\nport: " + this.port + "\nmaster: " + this.master + "\nmaster id: " + this.masterId + "\nbattery level: " + this.battery + "%\nposition: (" + this.position.getX() + "," + this.position.getY() + ")\nnOrders: " + this.nOrders + "\ncovered distance: " + this.coveredDistance + "\n";
         return status;
     }
 

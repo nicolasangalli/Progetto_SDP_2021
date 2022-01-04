@@ -6,6 +6,7 @@ service NetworkProto {
     rpc NewDronePosition(DronePosition) returns(HelloResponse) {};
     rpc FreeDrone(HelloRequest) returns(DroneDeliveryInfo) {};
     rpc DeliverOrder(Order) returns(HelloResponse) {};
+    rpc DeliverStats(DroneStats) returns(HelloResponse) {};
 }
 
 message NewDrone {
@@ -49,6 +50,17 @@ message DroneDeliveryInfo {
 
 message Order {
     required int32 orderId = 1;
-    required int32 x = 2;
-    required int32 y = 3;
+    required int32 x1 = 2;
+    required int32 y1 = 3;
+    required int32 x2 = 4;
+    required int32 y2 = 5;
+}
+
+message DroneStats {
+    required string timestamp = 1;
+    required int32 id = 2;
+    required int32 x = 3;
+    required int32 y = 4;
+    required int32 distance = 5;
+    required int32 battery = 6;
 }

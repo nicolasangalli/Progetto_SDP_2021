@@ -126,6 +126,9 @@ public class NetworkServiceImpl extends NetworkProtoGrpc.NetworkProtoImplBase {
                     .build();
             stub2.newDronePosition(req2);
             channel2.shutdownNow();
+        } else { //master
+            MQTTSubscription mqttSubscription = new MQTTSubscription(d);
+            mqttSubscription.start();
         }
 
         NetworkService.HelloResponse response = NetworkService.HelloResponse.newBuilder()
@@ -162,7 +165,7 @@ public class NetworkServiceImpl extends NetworkProtoGrpc.NetworkProtoImplBase {
 
     @Override
     public void deliverOrder(NetworkService.Order request, StreamObserver<NetworkService.HelloResponse> responseObserver) {
-        Order order = new Order(request.getOrderId(), new Coordinate(-1, -1), new Coordinate(request.getX(), request.getY()));
+        Order order = new Order(request.getOrderId(), new Coordinate(request.getX1(), request.getY1()), new Coordinate(request.getX2(), request.getY2()));
         Delivery delivery = new Delivery(d, order);
         delivery.start();
 
@@ -171,6 +174,11 @@ public class NetworkServiceImpl extends NetworkProtoGrpc.NetworkProtoImplBase {
                 .build();
         responseObserver.onNext(response);
         responseObserver.onCompleted();
+    }
+
+    @Override
+    public void deliverStats(NetworkService.DroneStats request, StreamObserver<NetworkService.HelloResponse> responseObserver) {
+
     }
 
     public Drone getD() {
