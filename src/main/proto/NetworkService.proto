@@ -3,6 +3,7 @@ service NetworkProto {
     rpc Greeting(HelloRequest) returns(HelloResponse) {};
     rpc Election(ElectionMsg) returns(HelloResponse) {};
     rpc Elected(ElectionMsg) returns(HelloResponse) {};
+    rpc NewDronePosition(DronePosition) returns(HelloResponse) {};
     rpc FreeDrone(HelloRequest) returns(DroneDeliveryInfo) {};
     rpc DeliverOrder(Order) returns(HelloResponse) {};
 }
@@ -30,6 +31,12 @@ message HelloResponse {
 message ElectionMsg {
     required int32 id = 1;
     optional int32 battery = 2;
+}
+
+message DronePosition {
+    required int32 id = 1;
+    required int32 x = 2;
+    required int32 y = 3;
 }
 
 message DroneDeliveryInfo {

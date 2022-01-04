@@ -1,3 +1,4 @@
+import Libraries.Coordinate;
 import Libraries.Drone;
 import Libraries.Order;
 import Libraries.TopologyDrone;
@@ -5,6 +6,7 @@ import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Random;
 import java.util.Scanner;
 
 
@@ -35,6 +37,12 @@ public class Console extends Thread {
             } else if(input.trim().equalsIgnoreCase("mqtt")) {
                 MQTTSubscription mqttSubscription = new MQTTSubscription(d);
                 mqttSubscription.start();
+            } else if(input.trim().equalsIgnoreCase("pos")) {
+                Random r = new Random();
+                Coordinate pos = new Coordinate(r.nextInt(10), r.nextInt(10));
+                d.setPosition(pos);
+                TopologyDrone td = d.getNetworkTopology().getDroneWithId(d.getId());
+                td.setPosition(pos);
             }
         }
     }

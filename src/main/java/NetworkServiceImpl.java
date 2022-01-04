@@ -71,6 +71,8 @@ public class NetworkServiceImpl extends NetworkProtoGrpc.NetworkProtoImplBase {
             d.setParticipant(false);
             d.setMaster(true);
             d.setMasterId(d.getId());
+            TopologyDrone master = d.getNetworkTopology().getDroneWithId(d.getId());
+            master.setPosition(d.getPosition());
 
             TopologyDrone nextDrone = d.getNetworkTopology().getNextDrone(d);
             final ManagedChannel channel = ManagedChannelBuilder.forTarget(nextDrone.getIp() + ":" + nextDrone.getPort())
@@ -98,6 +100,8 @@ public class NetworkServiceImpl extends NetworkProtoGrpc.NetworkProtoImplBase {
         d.setMasterId(id);
 
         if(id != d.getId()) {
+            d.setMaster(false);
+
             TopologyDrone nextDrone = d.getNetworkTopology().getNextDrone(d);
             final ManagedChannel channel = ManagedChannelBuilder.forTarget(nextDrone.getIp() + ":" + nextDrone.getPort())
                     .usePlaintext(true)
@@ -108,10 +112,36 @@ public class NetworkServiceImpl extends NetworkProtoGrpc.NetworkProtoImplBase {
                     .build();
             stub.elected(req);
             channel.shutdownNow();
+
+            //send the drone position to master
+            TopologyDrone master = d.getNetworkTopology().getDroneWithId(id);
+            final ManagedChannel channel2 = ManagedChannelBuilder.forTarget(master.getIp() + ":" + master.getPort())
+                    .usePlaintext(true)
+                    .build();
+            NetworkProtoGrpc.NetworkProtoBlockingStub stub2 = NetworkProtoGrpc.newBlockingStub(channel2);
+            NetworkService.DronePosition req2 = NetworkService.DronePosition.newBuilder()
+                    .setId(d.getId())
+                    .setX(d.getPosition().getX())
+                    .setY(d.getPosition().getY())
+                    .build();
+            stub2.newDronePosition(req2);
+            channel2.shutdownNow();
         }
 
         NetworkService.HelloResponse response = NetworkService.HelloResponse.newBuilder()
                 .setResp("elected...")
+                .build();
+        responseObserver.onNext(response);
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    public void newDronePosition(NetworkService.DronePosition request, StreamObserver<NetworkService.HelloResponse> responseObserver) {
+        TopologyDrone td = d.getNetworkTopology().getDroneWithId(request.getId());
+        td.setPosition(new Coordinate(request.getX(), request.getY()));
+
+        NetworkService.HelloResponse response = NetworkService.HelloResponse.newBuilder()
+                .setResp("new pos...")
                 .build();
         responseObserver.onNext(response);
         responseObserver.onCompleted();
