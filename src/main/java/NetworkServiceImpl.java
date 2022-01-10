@@ -11,6 +11,12 @@ public class NetworkServiceImpl extends NetworkProtoGrpc.NetworkProtoImplBase {
 
     private Drone d;
 
+    /*
+    Add a new drone in the drone topology.
+    Return the drone master id to the caller.
+    Called when:
+    - a new drone presents itself to the other drones
+    */
     @Override
     public void addNewDrone(NetworkService.NewDrone request, StreamObserver<NetworkService.Master> responseObserver) {
         TopologyDrone otherDrone = new TopologyDrone(request.getId(), request.getIp(), request.getPort(), new Coordinate(request.getX(), request.getY()));
@@ -23,6 +29,12 @@ public class NetworkServiceImpl extends NetworkProtoGrpc.NetworkProtoImplBase {
         responseObserver.onCompleted();
     }
 
+    /*
+    Answer the caller saying that this drone is reachable
+    Return the string "online" to the caller
+    Called when:
+    - the 'NetworkChecker' thread check if the next drone in the ring network is online
+     */
     @Override
     public void greeting(NetworkService.HelloRequest request, StreamObserver<NetworkService.HelloResponse> responseObserver) {
         NetworkService.HelloResponse response = NetworkService.HelloResponse.newBuilder()
@@ -32,6 +44,13 @@ public class NetworkServiceImpl extends NetworkProtoGrpc.NetworkProtoImplBase {
         responseObserver.onCompleted();
     }
 
+    /*
+    First method of the 'Chang and Roberts' master election algorithm, used to find the new master id.
+    The algorithm choose the drones with the greater battery level, in case of equality it chooses the drones with the greater id
+    Return a dummy string to the previous drone in the network ring
+    Called when:
+    - console call (temporary)
+     */
     @Override
     public void election(NetworkService.ElectionMsg request, StreamObserver<NetworkService.HelloResponse> responseObserver) {
         int id = request.getId();
@@ -67,7 +86,7 @@ public class NetworkServiceImpl extends NetworkProtoGrpc.NetworkProtoImplBase {
                 stub.election(req);
                 channel.shutdownNow();
             }
-        } else if(id == d.getId()) {
+        } else if(id == d.getId()) { //master
             d.setParticipant(false);
             d.setMaster(true);
             d.setMasterId(d.getId());
@@ -93,6 +112,12 @@ public class NetworkServiceImpl extends NetworkProtoGrpc.NetworkProtoImplBase {
         responseObserver.onCompleted();
     }
 
+    /*
+    Second method of the 'Chang and Roberts' master election algorithm, used to tell the new master id to the drones in the network ring
+    Return a dummy string to the previous drone in the network ring
+    Called when:
+    - the 'election' method has finished
+     */
     @Override
     public void elected(NetworkService.ElectionMsg request, StreamObserver<NetworkService.HelloResponse> responseObserver) {
         int id = request.getId();
@@ -138,6 +163,13 @@ public class NetworkServiceImpl extends NetworkProtoGrpc.NetworkProtoImplBase {
         responseObserver.onCompleted();
     }
 
+    /*
+    Master function only
+    Saves the new position of the caller drone in the network topology
+    Return a dummy string to the caller
+    Called when:
+    - during the 'elected' phase, a no-master drone receive the master id
+     */
     @Override
     public void newDronePosition(NetworkService.DronePosition request, StreamObserver<NetworkService.HelloResponse> responseObserver) {
         TopologyDrone td = d.getNetworkTopology().getDroneWithId(request.getId());
@@ -150,6 +182,11 @@ public class NetworkServiceImpl extends NetworkProtoGrpc.NetworkProtoImplBase {
         responseObserver.onCompleted();
     }
 
+    /*
+    Return to the caller (master) the information about this drone availability for a delivery
+    Called when:
+    - the 'MQTTSubscription' master thread wants to assign a new order to a drone
+     */
     @Override
     public void freeDrone(NetworkService.HelloRequest request, StreamObserver<NetworkService.DroneDeliveryInfo> responseObserver) {
         NetworkService.DroneDeliveryInfo response = NetworkService.DroneDeliveryInfo.newBuilder()
@@ -163,6 +200,12 @@ public class NetworkServiceImpl extends NetworkProtoGrpc.NetworkProtoImplBase {
         responseObserver.onCompleted();
     }
 
+    /*
+    Uses the received order info from the master and start the 'Delivery' thread
+    Return a dummy string to the master
+    Called when:
+    - the master has assigned an order
+     */
     @Override
     public void deliverOrder(NetworkService.Order request, StreamObserver<NetworkService.HelloResponse> responseObserver) {
         Order order = new Order(request.getOrderId(), new Coordinate(request.getX1(), request.getY1()), new Coordinate(request.getX2(), request.getY2()));
@@ -176,6 +219,13 @@ public class NetworkServiceImpl extends NetworkProtoGrpc.NetworkProtoImplBase {
         responseObserver.onCompleted();
     }
 
+    /*
+    Master function only
+    Updates the stats values with the received info from the caller
+    Return a dummy string to the caller
+    Called when:
+    - the 'Delivery' thread of the caller has finished the delivery
+     */
     @Override
     public void deliverStats(NetworkService.DroneStats request, StreamObserver<NetworkService.HelloResponse> responseObserver) {
         d.getAvgOrder().add(request.getNOrders());

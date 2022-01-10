@@ -1,3 +1,4 @@
+import Libraries.Coordinate;
 import Libraries.Drone;
 import Libraries.Order;
 import Libraries.TopologyDrone;
@@ -6,6 +7,7 @@ import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import org.eclipse.paho.client.mqttv3.*;
 import java.util.ArrayList;
+
 
 public class MQTTSubscription extends Thread {
 
@@ -108,6 +110,8 @@ public class MQTTSubscription extends Thread {
 
                 candidates.add(candidate);
             }
+
+            td.setPosition(new Coordinate(response.getX(), response.getY()));
 
             channel.shutdownNow();
         }

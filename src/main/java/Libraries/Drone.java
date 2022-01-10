@@ -22,13 +22,13 @@ public class Drone {
     private boolean participant;
 
     //Delivery
-    private ArrayList<Order> ordersList;
+    private ArrayList<Order> ordersList; //master-only
     private boolean delivering;
     private int nOrders;
     private int coveredDistance;
     private double pollutionLevel;
 
-    //Global stats
+    //Global stats (master-only)
     private ArrayList<Integer> avgOrder;
     private ArrayList<Integer> avgKm;
     private ArrayList<Double> avgPollution;
