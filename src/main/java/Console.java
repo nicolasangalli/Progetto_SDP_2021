@@ -3,6 +3,7 @@ import Libraries.Drone;
 import Libraries.TopologyDrone;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
+import org.eclipse.paho.client.mqttv3.MqttException;
 import java.io.InputStreamReader;
 import java.util.Random;
 import java.util.Scanner;
@@ -20,14 +21,16 @@ public class Console extends Thread {
         Scanner scanner = new Scanner(new InputStreamReader(System.in));
         while(true) {
             String input = scanner.nextLine();
-            if(input.trim().equalsIgnoreCase("stats")) {
-
-            } else if(input.trim().equalsIgnoreCase("print")) {
+            if(input.trim().equalsIgnoreCase("quit") || input.trim().equalsIgnoreCase("q") || input.trim().equalsIgnoreCase("exit")) {
+                MainDrone.explicitExit(d);
+            }
+            //debug command
+            else if(input.trim().equalsIgnoreCase("print")) {
                 System.out.println(d.getNetworkTopology().getNetworkDrones());
             } else if(input.trim().equalsIgnoreCase("status")) {
                 System.out.println(d.getStatus());
-            } else if(input.trim().equalsIgnoreCase("quit") || input.trim().equalsIgnoreCase("q") || input.trim().equalsIgnoreCase("exit")) {
-                System.out.println("quitting...");
+            } else if(input.trim().equalsIgnoreCase("d")) {
+                System.out.println(d.getDelivering());
             } else if(input.trim().equalsIgnoreCase("master")) {
                 masterElection(d);
             } else if(input.trim().equalsIgnoreCase("mqtt")) {
@@ -43,6 +46,7 @@ public class Console extends Thread {
         }
     }
 
+    //debug function
     private static void masterElection(Drone d) {
         d.setParticipant(true);
 

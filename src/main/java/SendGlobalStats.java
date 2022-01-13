@@ -11,7 +11,7 @@ public class SendGlobalStats extends Thread {
     }
 
     public void run() {
-        while(true) {
+        while(d.isLastSend() == false) {
             try {
                 Thread.sleep(10000);
             } catch (InterruptedException e) {

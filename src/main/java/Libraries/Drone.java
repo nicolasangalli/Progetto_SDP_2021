@@ -29,6 +29,7 @@ public class Drone {
     private double pollutionLevel;
 
     //Global stats (master-only)
+    private boolean lastSend;
     private ArrayList<Integer> avgOrder;
     private ArrayList<Integer> avgKm;
     private ArrayList<Double> avgPollution;
@@ -55,6 +56,7 @@ public class Drone {
         nOrders = 0;
         coveredDistance = 0;
 
+        lastSend = false;
         avgOrder = new ArrayList<>();
         avgKm = new ArrayList<>();
         avgPollution = new ArrayList<>();
@@ -218,4 +220,11 @@ public class Drone {
         return status;
     }
 
+    public boolean isLastSend() {
+        return lastSend;
+    }
+
+    public void setLastSend(boolean lastSend) {
+        this.lastSend = lastSend;
+    }
 }

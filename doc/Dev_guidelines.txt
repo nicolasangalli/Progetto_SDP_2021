@@ -6,22 +6,45 @@ Dronazon
 
 
 
-Drone
+Drone:
+1) MainDrone
+2) Console
+3) NetworkChecker
+4) PM10Simulator
+5) MQTTSubscription
+6) SendGlobalStats
+7) Delivery
 
-- Inizializzazione (main thread):
-	- creazione del drone (id, porta, indirizzo server amministratore);
-	- REST call al ServerAmministratore per entrare nella SmartCity:
-		- richiesta accetta (per ogni drone salvo id, IP, porta):
-			- riceve la posizione nella SmartCity e l'elenco degli altri droni (id, IP, porta);
-			- ordine l'elenco dei droni per ID;
-			- richiesta inserimento nella rete ad anello:
-				- inserimento riuscito:
-					- se è l'unico dell'anello si proclama master, altrimenti comunica la sua posizione e cerca il drone master;
-					- avvio dei thread "linea di comando", controllo batteria", "controllo rete", "sensore inquinamento";
-				- inserimento fallito:
-					- stop;
-		- richiesta rifiutata:
+
+1) MainDrone:
+	- drone initialization (id, ip, port, ammServerAddress);
+	- REST call to ServerAmministratore asking to be added to SmartCity:
+		- request accepted:
+			- receive the position and the other drones list;
+			- network ring generation:
+			    - only one in the network -> the drone becomes the master;
+			    - otherwise -> send the drone position to all the other drones in the network;
+			                -> receive the master id;
+			- start threads:
+			    - Console;
+			    - NetworkChecker;
+			    - PM10Simulator
+			    - if the drone is the master also:
+                    - MQTTSubscription;
+                    - SendGlobalStats;
+		- request refused:
 			- stop;
+
+2) Console
+    - if the user command is "quit":
+        - stop 'NetworkChecker' thread;
+        - if the drone is the master:
+                - disconnect from the MQTT broker;
+        - wait until, eventually, the undergoing delivery is finished;
+        - if the drone is the master:
+            - assign the last orders (until the orders list is empty);
+            - send for the last time the global stats to ServerAmministratore;
+        - REST call to ServerAmministratore asking to be removed from SmartCity;
 
 - Controllo rete:
 	- ogni n secondi:

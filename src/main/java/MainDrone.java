@@ -1,5 +1,6 @@
 import Libraries.Coordinate;
 import Libraries.Drone;
+import Libraries.Order;
 import Libraries.TopologyDrone;
 import Sensor.MeasurementBuffer;
 import Sensor.PM10Simulator;
@@ -8,6 +9,8 @@ import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import io.grpc.*;
+import org.eclipse.paho.client.mqttv3.MqttException;
+
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
@@ -23,6 +26,14 @@ public class MainDrone {
     private static WebResource webResource; //for REST call
     private static String restResponse; //REST call response
     private static Gson gson;
+
+    //Threads
+    public static Console console;
+    public static NetworkChecker networkChecker;
+    public static PM10Simulator pm10Simulator;
+    public static MQTTSubscription mqttSubscription;
+    public static SendGlobalStats sendGlobalStats;
+    public static Delivery delivery;
 
     public static void main(String[] args) {
         gson = new Gson();
@@ -149,7 +160,7 @@ public class MainDrone {
         //d.setMasterId(-1);
         //d.setBattery(random.nextInt(100));
 
-        Console console = new Console(d);
+        console = new Console(d);
         console.start();
         System.out.println("Console thread started");
         //NetworkChecker networkChecker = new NetworkChecker(d);
@@ -157,17 +168,155 @@ public class MainDrone {
         //System.out.println("Network checker thread started");
 
         MeasurementBuffer myBuffer = new MeasurementBuffer(d);
-        PM10Simulator pm10Simulator = new PM10Simulator(myBuffer);
+        pm10Simulator = new PM10Simulator(myBuffer);
         pm10Simulator.start();
 
         if(d.getMaster()) {
-            MQTTSubscription mqttSubscription = new MQTTSubscription(d);
+            mqttSubscription = new MQTTSubscription(d);
             mqttSubscription.start();
 
-            SendGlobalStats sendGlobalStats = new SendGlobalStats(d);
+            sendGlobalStats = new SendGlobalStats(d);
             sendGlobalStats.start();
         }
 
+    }
+
+    public static void removeFromSmartCity() {
+        WebResource webResource = client.resource(d.getServerAmmAddress() + "drone/remove");
+        webResource.type(MediaType.APPLICATION_JSON).delete(Integer.toString(d.getId()));
+    }
+
+    public static void assignOrder(Drone d, boolean itSelf) {
+        if(d.getOrdersList().size() > 0) {
+            Order order = d.getOrdersList().get(0);
+            d.getOrdersList().remove(0);
+            int idCandidate = bestAvailableDrone(d, order, itSelf);
+            if(idCandidate == -1) { //no drones available, reinsert the order in the list
+                if(itSelf) {
+                    d.getOrdersList().add(order);
+                }
+            } else {
+                if(idCandidate != d.getId()) {
+                    TopologyDrone drone = d.getNetworkTopology().getDroneWithId(idCandidate);
+
+                    final ManagedChannel channel = ManagedChannelBuilder.forTarget(drone.getIp() + ":" + drone.getPort())
+                            .usePlaintext(true)
+                            .build();
+
+                    NetworkProtoGrpc.NetworkProtoBlockingStub stub = NetworkProtoGrpc.newBlockingStub(channel);
+                    NetworkService.Order request = NetworkService.Order.newBuilder()
+                            .setOrderId(order.getId())
+                            .setX1(order.getStartPoint().getX())
+                            .setY1(order.getStartPoint().getY())
+                            .setX2(order.getFinishPoint().getX())
+                            .setY2(order.getFinishPoint().getY())
+                            .build();
+                    stub.deliverOrder(request);
+                    channel.shutdownNow();
+                } else {
+                    MainDrone.delivery = new Delivery(d, order);
+                    MainDrone.delivery.start();
+                }
+            }
+        }
+
+    }
+
+    private static int bestAvailableDrone(Drone d, Order order, boolean itSelf) {
+        ArrayList<ArrayList<Integer>> candidates = new ArrayList<>();
+        ArrayList<TopologyDrone> dronesList = d.getNetworkTopology().getDronesList();
+        for(TopologyDrone td : dronesList) {
+            if(td.getId() != d.getId()) {
+                final ManagedChannel channel = ManagedChannelBuilder.forTarget(td.getIp() + ":" + td.getPort())
+                        .usePlaintext(true)
+                        .build();
+
+                NetworkProtoGrpc.NetworkProtoBlockingStub stub = NetworkProtoGrpc.newBlockingStub(channel);
+                NetworkService.HelloRequest request = NetworkService.HelloRequest.newBuilder()
+                        .setId(d.getId())
+                        .build();
+                NetworkService.DroneDeliveryInfo response = stub.freeDrone(request);
+
+                if (response.getDelivery() == false) {
+                    ArrayList<Integer> candidate = new ArrayList<>();
+                    candidate.add(response.getId());
+                    int distance = (int) Math.sqrt(Math.pow(order.getStartPoint().getX() - response.getX(), 2) + Math.pow(order.getStartPoint().getY() - response.getY(), 2));
+                    candidate.add(distance);
+                    candidate.add(response.getBattery());
+
+                    candidates.add(candidate);
+                }
+
+                td.setPosition(new Coordinate(response.getX(), response.getY()));
+
+                channel.shutdownNow();
+            } else {
+                if (d.getDelivering() == false && itSelf == true) {
+                    ArrayList<Integer> candidate = new ArrayList<>();
+                    candidate.add(d.getId());
+                    int distance = (int) Math.sqrt(Math.pow(order.getStartPoint().getX() - d.getPosition().getX(), 2) + Math.pow(order.getStartPoint().getY() - d.getPosition().getY(), 2));
+                    candidate.add(distance);
+                    candidate.add(d.getBattery());
+
+                    candidates.add(candidate);
+                }
+            }
+        }
+
+        int minDistance = Integer.MAX_VALUE;
+        int maxBattery = -1;
+        int idCandidate = -1;
+        ArrayList<Integer> candidate = new ArrayList<>();
+        for(ArrayList<Integer> ali : candidates) {
+            if(ali.get(1) < minDistance) {
+                minDistance = ali.get(1);
+            }
+        }
+        for(ArrayList<Integer> ali : candidates) {
+            if(ali.get(2) > maxBattery && ali.get(1) == minDistance) {
+                maxBattery = ali.get(2);
+            }
+        }
+        for(ArrayList<Integer> ali : candidates) {
+            if(ali.get(0) > idCandidate && ali.get(1) == minDistance && ali.get(2) == maxBattery) {
+                idCandidate = ali.get(0);
+            }
+        }
+
+        return idCandidate;
+    }
+
+    public static void explicitExit(Drone d) {
+        if(d.getMaster()) {
+            try {
+                MainDrone.mqttSubscription.mqttClient.disconnect();
+            } catch (MqttException e) {
+                e.printStackTrace();
+            }
+        }
+        if(MainDrone.delivery != null && MainDrone.delivery.isAlive()) {
+            try {
+                MainDrone.delivery.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        if(d.getMaster()) {
+            System.out.println("Order list size: " + d.getOrdersList().size());
+            while(d.getOrdersList().size() > 0) {
+                MainDrone.assignOrder(d, false);
+            }
+            d.setLastSend(true);
+            if(MainDrone.sendGlobalStats.isAlive()) {
+                try {
+                    MainDrone.sendGlobalStats.join();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        MainDrone.removeFromSmartCity();
+        System.exit(0);
     }
 
 }
