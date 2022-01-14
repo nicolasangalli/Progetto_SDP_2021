@@ -10,10 +10,11 @@ Drone:
 1) MainDrone
 2) Console
 3) NetworkChecker
-4) PM10Simulator
-5) MQTTSubscription
-6) SendGlobalStats
-7) Delivery
+4) BatteryChecker
+5) PM10Simulator
+6) MQTTSubscription
+7) SendGlobalStats
+8) Delivery
 
 
 1) MainDrone:
@@ -57,23 +58,9 @@ Drone:
             - send the removed drone id to all the other drones (each has to remove it);
 
 
-- Controllo batteria:
-	- controllo il livello di batteria:
-		- >= 15%:
-			- ok, non faccio nulla;
-		- < 15%:
-			Metodo stop:
-				- termino l'eventuale consegna in corso e ...;
-				- controllo se il drone è il master o no:
-					- master:
-						- disconnessione dal broker MQTT;
-						- assegnare le consegne rimanenti;
-				- chiusura connessione con altri droni (forzata, non comunicare la propria uscita);
-				- controllo se il drone è il master o no:
-					- master:
-						- invio al ServerAmministratore le statistiche globali;
-				- REST call al ServerAmministratore per uscire dalla SmartCity:
-					- in ogni caso, stop;
+4) BatteryChecker
+	- if batteryLevel < 15%:
+			same function as quit command in 'Console' thread
 
 - Sensori inquinamento:
 	- avvio il rilevamento:

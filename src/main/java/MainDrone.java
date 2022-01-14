@@ -21,7 +21,7 @@ public class MainDrone {
     private static io.grpc.Server server; //for gRPC call
     private static NetworkServiceImpl networkServiceImpl; //for gRPC call
     private static Drone d;
-    private static Client client; //for REST call
+    public static Client client; //for REST call
     private static WebResource webResource; //for REST call
     private static String restResponse; //REST call response
     private static Gson gson;
@@ -29,6 +29,7 @@ public class MainDrone {
     //Threads
     public static Console console;
     public static NetworkChecker networkChecker;
+    //public static BatteryChecker batteryChecker;
     public static PM10Simulator pm10Simulator;
     public static MQTTSubscription mqttSubscription;
     public static SendGlobalStats sendGlobalStats;
@@ -167,6 +168,12 @@ public class MainDrone {
         networkChecker.start();
         System.out.println("NetworkChecker thread started");
 
+        /*
+        batteryChecker = new BatteryChecker(d);
+        batteryChecker.start();
+        System.out.println("BatteryChecker thread started");
+        */
+
         MeasurementBuffer myBuffer = new MeasurementBuffer(d);
         pm10Simulator = new PM10Simulator(myBuffer);
         pm10Simulator.start();
@@ -181,6 +188,8 @@ public class MainDrone {
             sendGlobalStats.start();
             System.out.println("SendGlobalStats thread started");
         }
+
+        System.out.println("");
 
     }
 

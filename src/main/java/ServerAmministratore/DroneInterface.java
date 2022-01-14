@@ -2,6 +2,7 @@ package ServerAmministratore;
 
 import Libraries.Coordinate;
 import Libraries.Drone;
+import Libraries.GlobalStat;
 import Libraries.TopologyDrone;
 import com.google.gson.Gson;
 import javax.ws.rs.*;
@@ -53,16 +54,13 @@ public class DroneInterface {
     }
 
     @Path("stats")
-    @GET
+    @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getStats() {
-        System.out.println("Drone master requested stats...");
-
-        ArrayList<TopologyDrone> retList = SmartCity.getInstance().getStats();
-        Gson gson = new Gson();
-        String resp = gson.toJson(retList);
-        return Response.ok(resp).build();
+    public Response getStats(GlobalStat globalStat) {
+        System.out.println("Drone master send stats...");
+        SmartCity.getInstance().addStat(globalStat);
+        return Response.ok().build();
     }
 
 }

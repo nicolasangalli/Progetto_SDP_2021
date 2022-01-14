@@ -42,10 +42,8 @@ public class Delivery extends Thread {
         d.setnOrders(d.getnOrders()+1);
         d.setCoveredDistance(d.getCoveredDistance() + distance);
 
-        d.setDelivering(false);
-
         System.out.println("Order " + order.getId());
-        System.out.println(d.getStatus());
+        System.out.println("Battery level: " + d.getBattery());
 
         //info to master
         if(d.getMaster() == false) {
@@ -72,6 +70,12 @@ public class Delivery extends Thread {
             d.getAvgKm().add(d.getCoveredDistance());
             d.getAvgPollution().add(d.getPollutionLevel());
             d.getAvgBattery().add(d.getBattery());
+        }
+
+        d.setDelivering(false);
+
+        if(d.getBattery() < 15) {
+            MainDrone.explicitExit(d);
         }
 
     }

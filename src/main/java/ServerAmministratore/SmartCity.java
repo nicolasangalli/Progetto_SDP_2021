@@ -1,6 +1,7 @@
 package ServerAmministratore;
 
 import Libraries.Coordinate;
+import Libraries.GlobalStat;
 import Libraries.TopologyDrone;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.util.ArrayList;
@@ -12,9 +13,11 @@ public class SmartCity {
 
     private static SmartCity instance;
     private ArrayList<TopologyDrone> drones;
+    private ArrayList<GlobalStat> globalStats;
 
     private SmartCity() {
         drones = new ArrayList<>();
+        globalStats = new ArrayList<>();
     }
 
     public synchronized static SmartCity getInstance() {
@@ -73,6 +76,10 @@ public class SmartCity {
     public ArrayList<TopologyDrone> getStats() {
         ArrayList<TopologyDrone> list = drones;
         return list;
+    }
+
+    public synchronized void addStat(GlobalStat globalStat) {
+        globalStats.add(globalStat);
     }
 
 }

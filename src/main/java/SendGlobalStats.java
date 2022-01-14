@@ -1,4 +1,9 @@
 import Libraries.Drone;
+import Libraries.GlobalStat;
+import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.WebResource;
+import javax.ws.rs.core.MediaType;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 
 
@@ -35,6 +40,7 @@ public class SendGlobalStats extends Thread {
                     avgOrder += i;
                 }
                 avgOrder /= avgOrderList.size();
+
                 double avgKm = 0;
                 for (int i : avgKmList) {
                     avgKm += i;
@@ -53,7 +59,9 @@ public class SendGlobalStats extends Thread {
                 }
                 avgBattery /= avgBatteryList.size();
 
-                System.out.println("Send global stats:\n" + avgOrder + " - " + avgKm + " - " + avgPollution + " - " + avgBattery + "\n");
+                GlobalStat globalStat = new GlobalStat(new Timestamp(System.currentTimeMillis()).toString(), avgOrder, avgKm, avgPollution, avgBattery);
+                WebResource webResource = MainDrone.client.resource(d.getServerAmmAddress() + "drone/stats");
+                webResource.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, globalStat);
             }
         }
     }

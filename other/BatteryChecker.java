@@ -1,6 +1,5 @@
-package Other;
-
 import Libraries.Drone;
+
 
 public class BatteryChecker extends Thread {
 
@@ -14,12 +13,12 @@ public class BatteryChecker extends Thread {
     public synchronized void run() {
         while(d.getBattery() >= 15) {
             try {
-                wait();
+                this.wait();
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
             if(d.getBattery() < 15) {
-                d.setBattery(100);
+                System.out.println("Battery empty");
             }
         }
     }
