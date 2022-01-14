@@ -5,13 +5,15 @@ import java.util.ArrayList;
 public class SendGlobalStats extends Thread {
 
     private Drone d;
+    public boolean sending;
 
     public SendGlobalStats(Drone d) {
         this.d = d;
+        sending = true;
     }
 
     public void run() {
-        while(d.isLastSend() == false) {
+        while(sending) {
             try {
                 Thread.sleep(10000);
             } catch (InterruptedException e) {

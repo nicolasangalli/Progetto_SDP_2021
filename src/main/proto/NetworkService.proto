@@ -1,5 +1,6 @@
 service NetworkProto {
     rpc AddNewDrone(NewDrone) returns(Master) {};
+    rpc RemoveDrone(DroneId) returns(HelloResponse) {};
     rpc Greeting(HelloRequest) returns(HelloResponse) {};
     rpc Election(ElectionMsg) returns(HelloResponse) {};
     rpc Elected(ElectionMsg) returns(HelloResponse) {};
@@ -17,6 +18,10 @@ message NewDrone {
     required int32 y = 5;
 }
 
+message DroneId {
+    required int32 id = 1;
+}
+
 message Master {
     required int32 masterId = 1;
 }
@@ -32,6 +37,7 @@ message HelloResponse {
 message ElectionMsg {
     required int32 id = 1;
     optional int32 battery = 2;
+    optional int32 idOldMaster = 3;
 }
 
 message DronePosition {

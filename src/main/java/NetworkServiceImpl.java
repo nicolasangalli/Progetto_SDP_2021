@@ -30,11 +30,28 @@ public class NetworkServiceImpl extends NetworkProtoGrpc.NetworkProtoImplBase {
     }
 
     /*
-    Answer the caller saying that this drone is reachable
-    Return the string "online" to the caller
-    Called when:
-    - the 'NetworkChecker' thread check if the next drone in the ring network is online
-     */
+        Remove the drone with a specific id in the network.
+        Return a dummy string.
+        Called when:
+        - a drone know that the next drone is not reachable and wants to inform the others drones in the network
+        */
+    @Override
+    public void removeDrone(NetworkService.DroneId request, StreamObserver<NetworkService.HelloResponse> responseObserver) {
+        d.getNetworkTopology().removeDrone(request.getId());
+
+        NetworkService.HelloResponse response = NetworkService.HelloResponse.newBuilder()
+                .setResp("remove")
+                .build();
+        responseObserver.onNext(response);
+        responseObserver.onCompleted();
+    }
+
+    /*
+        Answer the caller saying that this drone is reachable
+        Return the string "online" to the caller
+        Called when:
+        - the 'NetworkChecker' thread check if the next drone in the ring network is online
+         */
     @Override
     public void greeting(NetworkService.HelloRequest request, StreamObserver<NetworkService.HelloResponse> responseObserver) {
         NetworkService.HelloResponse response = NetworkService.HelloResponse.newBuilder()
@@ -46,6 +63,7 @@ public class NetworkServiceImpl extends NetworkProtoGrpc.NetworkProtoImplBase {
 
     /*
     First method of the 'Chang and Roberts' master election algorithm, used to find the new master id.
+    First of all the function removed the old master drone from the network.
     The algorithm choose the drones with the greater battery level, in case of equality it chooses the drones with the greater id
     Return a dummy string to the previous drone in the network ring
     Called when:
@@ -55,6 +73,10 @@ public class NetworkServiceImpl extends NetworkProtoGrpc.NetworkProtoImplBase {
     public void election(NetworkService.ElectionMsg request, StreamObserver<NetworkService.HelloResponse> responseObserver) {
         int id = request.getId();
         int battery = request.getBattery();
+        int idOldMaster = request.getIdOldMaster();
+
+        TopologyDrone oldMaster = d.getNetworkTopology().getDroneWithId(idOldMaster);
+        d.getNetworkTopology().removeDrone(oldMaster);
 
         if(battery > d.getBattery() || (battery == d.getBattery() && id > d.getId())) {
             d.setParticipant(true);

@@ -9,8 +9,6 @@ import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import io.grpc.*;
-import org.eclipse.paho.client.mqttv3.MqttException;
-
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
@@ -163,20 +161,21 @@ public class MainDrone {
         console = new Console(d);
         console.start();
         System.out.println("Console thread started");
-        //NetworkChecker networkChecker = new NetworkChecker(d);
-        //networkChecker.start();
-        //System.out.println("Network checker thread started");
+
+        networkChecker = new NetworkChecker(d);
+        networkChecker.start();
+        System.out.println("Network checker thread started");
 
         MeasurementBuffer myBuffer = new MeasurementBuffer(d);
         pm10Simulator = new PM10Simulator(myBuffer);
-        pm10Simulator.start();
+        //pm10Simulator.start();
 
         if(d.getMaster()) {
             mqttSubscription = new MQTTSubscription(d);
-            mqttSubscription.start();
+            //mqttSubscription.start();
 
             sendGlobalStats = new SendGlobalStats(d);
-            sendGlobalStats.start();
+            //sendGlobalStats.start();
         }
 
     }
@@ -287,35 +286,41 @@ public class MainDrone {
     }
 
     public static void explicitExit(Drone d) {
+        //console.interrupt();
+        networkChecker.running = false;
+        try {
+            networkChecker.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+/*
         if(d.getMaster()) {
             try {
-                MainDrone.mqttSubscription.mqttClient.disconnect();
+                mqttSubscription.mqttClient.disconnect();
             } catch (MqttException e) {
                 e.printStackTrace();
             }
         }
-        if(MainDrone.delivery != null && MainDrone.delivery.isAlive()) {
+        if(delivery != null && d.getDelivering()) {
             try {
-                MainDrone.delivery.join();
+                delivery.join();
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
         if(d.getMaster()) {
-            System.out.println("Order list size: " + d.getOrdersList().size());
             while(d.getOrdersList().size() > 0) {
-                MainDrone.assignOrder(d, false);
+                assignOrder(d, false);
             }
-            d.setLastSend(true);
-            if(MainDrone.sendGlobalStats.isAlive()) {
-                try {
-                    MainDrone.sendGlobalStats.join();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+            pm10Simulator.stopMeGently();
+            sendGlobalStats.sending = false;
+            try {
+                sendGlobalStats.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
-        }
-        MainDrone.removeFromSmartCity();
+        }*/
+        removeFromSmartCity();
         System.exit(0);
     }
 

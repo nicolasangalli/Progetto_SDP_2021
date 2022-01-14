@@ -37,32 +37,25 @@ Drone:
 
 2) Console
     - if the user command is "quit":
-        - stop 'NetworkChecker' thread;
+        - stop 'NetworkChecker' and 'Console' threads;
         - if the drone is the master:
                 - disconnect from the MQTT broker;
         - wait until, eventually, the undergoing delivery is finished;
         - if the drone is the master:
             - assign the last orders (until the orders list is empty);
+            - stop 'PM10Simulator' thread;
             - send for the last time the global stats to ServerAmministratore;
         - REST call to ServerAmministratore asking to be removed from SmartCity;
 
-- Controllo rete:
-	- ogni n secondi:
-		- controllo che il nodo successivo sia raggiungibile:
-			- si:
-				- non faccio nulla;
-			- no:
-				- ricostruisco l'anello;
-				- controllo se era il master:
-					- master:
-						- elezione nuovo master (Chang and Roberts), viene scelto il drone con batteria maggiore (in caso di parità con id maggiore);
-						- ricezione dell'id del nuovo master;
-						- invio della posizione al nuovo master;
-					- NON master:
-						- OK, non faccio nulla;
+3) NetworkChecker
+	- every 5 seconds:
+		- if the next drone in the network ring is not alive:
+		    - remove the master drone from the network ring
+		    - it's the master:
+		        - send the removed drone id to the new next drone (it has to remove it) and start an election (Chang and Roberts);
+        - it's not the master:
+            - send the removed drone id to all the other drones (each has to remove it);
 
-- Linea di comando:
-	- linea di comando per l'uscita con il comando quit (metodo stop);
 
 - Controllo batteria:
 	- controllo il livello di batteria:

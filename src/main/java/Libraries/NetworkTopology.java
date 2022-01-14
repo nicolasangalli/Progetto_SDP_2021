@@ -22,7 +22,7 @@ public class NetworkTopology {
         orderDroneList();
     }
 
-    public TopologyDrone getDroneWithId(int id) {
+    public synchronized TopologyDrone getDroneWithId(int id) {
         for(TopologyDrone td : dronesList) {
             if(td.getId() == id) {
                 return td;
@@ -31,12 +31,12 @@ public class NetworkTopology {
         return null;
     }
 
-    public void addNewDrone(TopologyDrone d) {
+    public synchronized void addNewDrone(TopologyDrone d) {
         dronesList.add(d);
         orderDroneList();
     }
 
-    public void addNewDrone(Drone d) {
+    public synchronized void addNewDrone(Drone d) {
         TopologyDrone td = new TopologyDrone(d.getId(), d.getIp(), d.getPort(), d.getPosition());
         dronesList.add(td);
         orderDroneList();
@@ -60,7 +60,7 @@ public class NetworkTopology {
         }
     }
 
-    public TopologyDrone getNextDrone(TopologyDrone d) {
+    public synchronized TopologyDrone getNextDrone(TopologyDrone d) {
         if(dronesList.size() <= 1) {
             return null;
         }
@@ -73,7 +73,7 @@ public class NetworkTopology {
         return dronesList.get(index);
     }
 
-    public TopologyDrone getNextDrone(Drone d) {
+    public synchronized TopologyDrone getNextDrone(Drone d) {
         if(dronesList.size() <= 1) {
             return dronesList.get(0);
         }
@@ -95,7 +95,7 @@ public class NetworkTopology {
         return dronesList.get(index);
     }
 
-    public String getNetworkDrones() {
+    public synchronized String getNetworkDrones() {
         String ret = "Drones in the network:\n";
         for (TopologyDrone d : dronesList) {
             ret += "(" + d.getId() + ", ip: " + d.getIp() + ", port: " + d.getPort() + ", pos:("+ d.getPosition().getX() + "," + d.getPosition().getY() + "))\n";
@@ -103,8 +103,17 @@ public class NetworkTopology {
         return ret;
     }
 
-    public void removeDrone(TopologyDrone d) {
+    public synchronized void removeDrone(TopologyDrone d) {
         dronesList.remove(d);
+    }
+
+    public synchronized void removeDrone(int id) {
+        for(TopologyDrone td : dronesList) {
+            if(td.getId() == id) {
+                dronesList.remove(td);
+                break;
+            }
+        }
     }
 
 }
