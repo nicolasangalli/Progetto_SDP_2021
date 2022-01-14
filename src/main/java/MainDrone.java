@@ -9,6 +9,7 @@ import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import io.grpc.*;
+import org.eclipse.paho.client.mqttv3.MqttException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
@@ -164,18 +165,21 @@ public class MainDrone {
 
         networkChecker = new NetworkChecker(d);
         networkChecker.start();
-        System.out.println("Network checker thread started");
+        System.out.println("NetworkChecker thread started");
 
         MeasurementBuffer myBuffer = new MeasurementBuffer(d);
         pm10Simulator = new PM10Simulator(myBuffer);
-        //pm10Simulator.start();
+        pm10Simulator.start();
+        System.out.println("PM10Simulator thread started");
 
         if(d.getMaster()) {
             mqttSubscription = new MQTTSubscription(d);
-            //mqttSubscription.start();
+            mqttSubscription.start();
+            System.out.println("MQTTSubscription thread started");
 
             sendGlobalStats = new SendGlobalStats(d);
-            //sendGlobalStats.start();
+            sendGlobalStats.start();
+            System.out.println("SendGlobalStats thread started");
         }
 
     }
@@ -293,7 +297,7 @@ public class MainDrone {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-/*
+
         if(d.getMaster()) {
             try {
                 mqttSubscription.mqttClient.disconnect();
@@ -319,7 +323,7 @@ public class MainDrone {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-        }*/
+        }
         removeFromSmartCity();
         System.exit(0);
     }

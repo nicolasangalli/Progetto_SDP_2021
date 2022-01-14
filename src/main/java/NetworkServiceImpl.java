@@ -176,9 +176,11 @@ public class NetworkServiceImpl extends NetworkProtoGrpc.NetworkProtoImplBase {
         } else { //master
             MainDrone.mqttSubscription = new MQTTSubscription(d);
             MainDrone.mqttSubscription.start();
+            System.out.println("MQTTSubscription thread started");
 
             MainDrone.sendGlobalStats = new SendGlobalStats(d);
             MainDrone.sendGlobalStats.start();
+            System.out.println("SendGlobalStats thread started");
         }
 
         NetworkService.HelloResponse response = NetworkService.HelloResponse.newBuilder()
