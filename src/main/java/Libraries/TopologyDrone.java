@@ -52,4 +52,9 @@ public class TopologyDrone {
         this.position = position;
     }
 
+    public String getStatus() {
+        String status = "id: " + id + "\nip: " + ip + "\nport: " + port + "\nposition: (" + position.getX() + "," + position.getY() + ")\n";
+        return status;
+    }
+
 }
