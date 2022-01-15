@@ -25,6 +25,7 @@ public class MainDrone {
     private static WebResource webResource; //for REST call
     private static String restResponse; //REST call response
     private static Gson gson;
+    public static ArrayList<ArrayList<Integer>> candidates; //for bestAvailableDrone thread
 
     //Threads
     public static Console console;
@@ -127,6 +128,26 @@ public class MainDrone {
         } else {
             System.out.println("Comunicate to all other drones my insertion in the network...");
             dronesList = d.getNetworkTopology().getDronesList();
+
+            ArrayList<ParallelComunication> parallelThreads = new ArrayList<>();
+            for(TopologyDrone otherDrone: dronesList) {
+                if(otherDrone.getId() != d.getId()) {
+                    ParallelComunication parallelComunication = new ParallelComunication(d, otherDrone, "greeting");
+                    parallelThreads.add(parallelComunication);
+                }
+            }
+            for(ParallelComunication pc : parallelThreads) {
+                pc.start();
+            }
+            for(ParallelComunication pc : parallelThreads) {
+                try {
+                    pc.join();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            /*
             for(TopologyDrone otherDrone : dronesList) {
                 if(otherDrone.getId() != d.getId()) {
                     System.out.println("Try to communicate with drone with id = " + otherDrone.getId());
@@ -148,18 +169,12 @@ public class MainDrone {
                     channel.shutdownNow();
                 }
             }
+            */
         }
         System.out.println("Network ring generated!\n");
     }
 
     private static void startThreads() {
-
-        //debug
-        //Random random = new Random();
-        //d.setMaster(false);
-        //d.setMasterId(-1);
-        //d.setBattery(random.nextInt(100));
-
         console = new Console(d);
         console.start();
         System.out.println("Console thread started");
@@ -235,10 +250,15 @@ public class MainDrone {
     }
 
     private static int bestAvailableDrone(Drone d, Order order, boolean itSelf) {
-        ArrayList<ArrayList<Integer>> candidates = new ArrayList<>();
+        candidates = new ArrayList<>();
         ArrayList<TopologyDrone> dronesList = d.getNetworkTopology().getDronesList();
+        ArrayList<ParallelComunication> parallelThreads = new ArrayList<>();
         for(TopologyDrone td : dronesList) {
             if(td.getId() != d.getId()) {
+                ParallelComunication parallelComunication = new ParallelComunication(d, td, "bestAvailableDrone", order);
+                parallelThreads.add(parallelComunication);
+
+                /*
                 final ManagedChannel channel = ManagedChannelBuilder.forTarget(td.getIp() + ":" + td.getPort())
                         .usePlaintext(true)
                         .build();
@@ -262,6 +282,7 @@ public class MainDrone {
                 td.setPosition(new Coordinate(response.getX(), response.getY()));
 
                 channel.shutdownNow();
+                */
             } else {
                 if (d.getDelivering() == false && itSelf == true) {
                     ArrayList<Integer> candidate = new ArrayList<>();
@@ -272,6 +293,17 @@ public class MainDrone {
 
                     candidates.add(candidate);
                 }
+            }
+        }
+
+        for(ParallelComunication pc : parallelThreads) {
+            pc.start();
+        }
+        for(ParallelComunication pc : parallelThreads) {
+            try {
+                pc.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
         }
 

@@ -3,6 +3,7 @@ import Libraries.TopologyDrone;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.StatusRuntimeException;
+import java.util.ArrayList;
 
 
 public class NetworkChecker extends Thread {
@@ -64,17 +65,35 @@ public class NetworkChecker extends Thread {
                         } else {
                             System.out.println("Droni rimasti: " + d.getNetworkTopology().getDronesList().size());
 
-                            for(TopologyDrone td : d.getNetworkTopology().getDronesList()) {
-                                final ManagedChannel channel2 = ManagedChannelBuilder.forTarget(td.getIp() + ":" + td.getPort())
-                                        .usePlaintext(true)
-                                        .build();
+                            if(d.getNetworkTopology().getDronesList().size() > 0) {
+                                ArrayList<ParallelComunication> parallelThreads = new ArrayList<>();
+                                for (TopologyDrone td : d.getNetworkTopology().getDronesList()) {
+                                    ParallelComunication parallelComunication = new ParallelComunication(d, td, "remove", idDeletedDrone);
+                                    parallelThreads.add(parallelComunication);
 
-                                NetworkProtoGrpc.NetworkProtoBlockingStub stub2 = NetworkProtoGrpc.newBlockingStub(channel2);
-                                NetworkService.DroneId request2 = NetworkService.DroneId.newBuilder()
-                                        .setId(idDeletedDrone)
-                                        .build();
-                                stub2.removeDrone(request2);
-                                channel.shutdownNow();
+                                    /*
+                                    final ManagedChannel channel2 = ManagedChannelBuilder.forTarget(td.getIp() + ":" + td.getPort())
+                                            .usePlaintext(true)
+                                            .build();
+
+                                    NetworkProtoGrpc.NetworkProtoBlockingStub stub2 = NetworkProtoGrpc.newBlockingStub(channel2);
+                                    NetworkService.DroneId request2 = NetworkService.DroneId.newBuilder()
+                                            .setId(idDeletedDrone)
+                                            .build();
+                                    stub2.removeDrone(request2);
+                                    channel.shutdownNow();
+                                    */
+                                }
+                                for (ParallelComunication pc : parallelThreads) {
+                                    pc.start();
+                                }
+                                for (ParallelComunication pc : parallelThreads) {
+                                    try {
+                                        pc.join();
+                                    } catch (InterruptedException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
                             }
                         }
                     } else {
