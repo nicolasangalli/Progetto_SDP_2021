@@ -15,6 +15,7 @@ Drone:
 6) MQTTSubscription
 7) SendGlobalStats
 8) Delivery
+9) ParallelCommunication
 
 
 1) MainDrone:

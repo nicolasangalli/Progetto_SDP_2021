@@ -7,7 +7,7 @@ import io.grpc.ManagedChannelBuilder;
 import java.util.ArrayList;
 
 
-public class ParallelComunication  extends Thread {
+public class ParallelCommunication extends Thread {
 
     private Drone d;
     private TopologyDrone td;
@@ -15,7 +15,7 @@ public class ParallelComunication  extends Thread {
     private Order order;
     private int idDeletedDrone;
 
-    public ParallelComunication(Drone d, TopologyDrone td, String type) {
+    public ParallelCommunication(Drone d, TopologyDrone td, String type) {
         this.d = d;
         this.td = td;
         this.type = type;
@@ -23,7 +23,7 @@ public class ParallelComunication  extends Thread {
         this.idDeletedDrone = -1;
     }
 
-    public ParallelComunication(Drone d, TopologyDrone td, String type, Order order) {
+    public ParallelCommunication(Drone d, TopologyDrone td, String type, Order order) {
         this.d = d;
         this.td = td;
         this.type = type;
@@ -31,7 +31,7 @@ public class ParallelComunication  extends Thread {
         this.idDeletedDrone = -1;
     }
 
-    public ParallelComunication(Drone d, TopologyDrone td, String type, int idDeletedDrone) {
+    public ParallelCommunication(Drone d, TopologyDrone td, String type, int idDeletedDrone) {
         this.d = d;
         this.td = td;
         this.type = type;

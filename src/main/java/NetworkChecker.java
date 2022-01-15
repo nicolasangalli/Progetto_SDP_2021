@@ -66,10 +66,10 @@ public class NetworkChecker extends Thread {
                             System.out.println("Droni rimasti: " + d.getNetworkTopology().getDronesList().size());
 
                             if(d.getNetworkTopology().getDronesList().size() > 0) {
-                                ArrayList<ParallelComunication> parallelThreads = new ArrayList<>();
+                                ArrayList<ParallelCommunication> parallelThreads = new ArrayList<>();
                                 for (TopologyDrone td : d.getNetworkTopology().getDronesList()) {
-                                    ParallelComunication parallelComunication = new ParallelComunication(d, td, "remove", idDeletedDrone);
-                                    parallelThreads.add(parallelComunication);
+                                    ParallelCommunication parallelCommunication = new ParallelCommunication(d, td, "remove", idDeletedDrone);
+                                    parallelThreads.add(parallelCommunication);
 
                                     /*
                                     final ManagedChannel channel2 = ManagedChannelBuilder.forTarget(td.getIp() + ":" + td.getPort())
@@ -84,10 +84,10 @@ public class NetworkChecker extends Thread {
                                     channel.shutdownNow();
                                     */
                                 }
-                                for (ParallelComunication pc : parallelThreads) {
+                                for (ParallelCommunication pc : parallelThreads) {
                                     pc.start();
                                 }
-                                for (ParallelComunication pc : parallelThreads) {
+                                for (ParallelCommunication pc : parallelThreads) {
                                     try {
                                         pc.join();
                                     } catch (InterruptedException e) {

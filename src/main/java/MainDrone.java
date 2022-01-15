@@ -129,17 +129,17 @@ public class MainDrone {
             System.out.println("Comunicate to all other drones my insertion in the network...");
             dronesList = d.getNetworkTopology().getDronesList();
 
-            ArrayList<ParallelComunication> parallelThreads = new ArrayList<>();
+            ArrayList<ParallelCommunication> parallelThreads = new ArrayList<>();
             for(TopologyDrone otherDrone: dronesList) {
                 if(otherDrone.getId() != d.getId()) {
-                    ParallelComunication parallelComunication = new ParallelComunication(d, otherDrone, "greeting");
-                    parallelThreads.add(parallelComunication);
+                    ParallelCommunication parallelCommunication = new ParallelCommunication(d, otherDrone, "greeting");
+                    parallelThreads.add(parallelCommunication);
                 }
             }
-            for(ParallelComunication pc : parallelThreads) {
+            for(ParallelCommunication pc : parallelThreads) {
                 pc.start();
             }
-            for(ParallelComunication pc : parallelThreads) {
+            for(ParallelCommunication pc : parallelThreads) {
                 try {
                     pc.join();
                 } catch (InterruptedException e) {
@@ -252,11 +252,11 @@ public class MainDrone {
     private static int bestAvailableDrone(Drone d, Order order, boolean itSelf) {
         candidates = new ArrayList<>();
         ArrayList<TopologyDrone> dronesList = d.getNetworkTopology().getDronesList();
-        ArrayList<ParallelComunication> parallelThreads = new ArrayList<>();
+        ArrayList<ParallelCommunication> parallelThreads = new ArrayList<>();
         for(TopologyDrone td : dronesList) {
             if(td.getId() != d.getId()) {
-                ParallelComunication parallelComunication = new ParallelComunication(d, td, "bestAvailableDrone", order);
-                parallelThreads.add(parallelComunication);
+                ParallelCommunication parallelCommunication = new ParallelCommunication(d, td, "bestAvailableDrone", order);
+                parallelThreads.add(parallelCommunication);
 
                 /*
                 final ManagedChannel channel = ManagedChannelBuilder.forTarget(td.getIp() + ":" + td.getPort())
@@ -296,10 +296,10 @@ public class MainDrone {
             }
         }
 
-        for(ParallelComunication pc : parallelThreads) {
+        for(ParallelCommunication pc : parallelThreads) {
             pc.start();
         }
-        for(ParallelComunication pc : parallelThreads) {
+        for(ParallelCommunication pc : parallelThreads) {
             try {
                 pc.join();
             } catch (InterruptedException e) {
@@ -342,6 +342,7 @@ public class MainDrone {
         if(d.getMaster()) {
             try {
                 mqttSubscription.mqttClient.disconnect();
+                mqttSubscription.mqttClient.close();
             } catch (MqttException e) {
                 e.printStackTrace();
             }
