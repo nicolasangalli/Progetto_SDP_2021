@@ -37,7 +37,7 @@ public class NetworkChecker extends Thread {
                     NetworkService.HelloRequest request = NetworkService.HelloRequest.newBuilder()
                             .setId(d.getId())
                             .build();
-                    NetworkService.HelloResponse response = stub.greeting(request);
+                    stub.greeting(request);
                     channel.shutdownNow();
                     System.out.println("drone " + nextDrone.getId() + " reachable");
                 } catch (StatusRuntimeException sre) {

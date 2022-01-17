@@ -93,15 +93,15 @@ public class Drone {
         this.serverAmmAddress = serverAmmAddress;
     }
 
-    public Coordinate getPosition() {
+    public synchronized Coordinate getPosition() {
         return position;
     }
 
-    public void setPosition(Coordinate position) {
+    public synchronized void setPosition(Coordinate position) {
         this.position = position;
     }
 
-    public NetworkTopology getNetworkTopology() {
+    public synchronized NetworkTopology getNetworkTopology() {
         return networkTopology;
     }
 
@@ -109,27 +109,27 @@ public class Drone {
         this.networkTopology = networkTopology;
     }
 
-    public int getMasterId() {
+    public synchronized int getMasterId() {
         return masterId;
     }
 
-    public void setMasterId(int masterId) {
+    public synchronized void setMasterId(int masterId) {
         this.masterId = masterId;
     }
 
-    public boolean getMaster() {
+    public synchronized boolean getMaster() {
         return master;
     }
 
-    public void setMaster(boolean master) {
+    public synchronized void setMaster(boolean master) {
         this.master = master;
     }
 
-    public int getBattery() {
+    public synchronized int getBattery() {
         return battery;
     }
 
-    public void setBattery(int battery) {
+    public synchronized void setBattery(int battery) {
         this.battery = battery;
     }
 
@@ -141,11 +141,11 @@ public class Drone {
         this.participant = participant;
     }
 
-    public ArrayList<Order> getOrdersList() {
+    public synchronized ArrayList<Order> getOrdersList() {
         return ordersList;
     }
 
-    public void addOrder(Order o) {
+    public synchronized void addOrder(Order o) {
         ordersList.add(o);
     }
 
@@ -181,7 +181,7 @@ public class Drone {
         this.pollutionLevel = pollutionLevel;
     }
 
-    public ArrayList<Integer> getAvgOrder() {
+    public synchronized ArrayList<Integer> getAvgOrder() {
         return avgOrder;
     }
 
@@ -189,7 +189,7 @@ public class Drone {
         this.avgOrder = avgOrder;
     }
 
-    public ArrayList<Integer> getAvgKm() {
+    public synchronized ArrayList<Integer> getAvgKm() {
         return avgKm;
     }
 
@@ -197,7 +197,7 @@ public class Drone {
         this.avgKm = avgKm;
     }
 
-    public ArrayList<Double> getAvgPollution() {
+    public synchronized ArrayList<Double> getAvgPollution() {
         return avgPollution;
     }
 
@@ -205,7 +205,7 @@ public class Drone {
         this.avgPollution = avgPollution;
     }
 
-    public ArrayList<Integer> getAvgBattery() {
+    public synchronized ArrayList<Integer> getAvgBattery() {
         return avgBattery;
     }
 

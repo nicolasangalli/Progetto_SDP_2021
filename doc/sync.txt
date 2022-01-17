@@ -1,0 +1,113 @@
+- d.getNetworkTopology().getDronesList (networkTopology, dronesList)
+    NetworkChecker
+    MQTTSubscription
+
+- d.getNetworkTopology().getNextDrone (networkTopology, dronesList)
+    NetworkChecker
+
+- d.getNetworkTopology().getDroneWithId (networkTopology, dronesList)
+    NetworkChecker
+    Delivery
+
+- d.getBattery (battery)
+    NetworkChecker
+    Delivery
+
+- d.getPosition() (d.position)
+    NetworkChecker
+    Delivery
+
+- d.setParticipant (participant)
+    NetworkChecker
+
+- d.setMaster (master)
+    NetworkChecker
+
+- d.setMasterId (masterId)
+    NetworkChecker
+    ParallelCommunication
+
+- td.setPosition (td.position)
+    NetworkChecker
+    ParallelCommunication
+
+- d.setPollutionLevel (pollutionLevel)
+    PM10Simulator
+
+- d.getOrderList (ordersList)
+    MQTTSubscription
+
+- d.addOrder (ordersList)
+    MQTTSubscription
+
+- d.getOrdersList().remove (ordersList)
+    MQTTSubscription
+
+- d.getAvgOrder (avgOrder)
+    SendGlobalStats
+
+- d.getAvgKm (avgKm)
+    SendGlobalStats
+
+- d.getAvgPollution (avgPollution)
+    SendGlobalStats
+
+- d.getAvgBattery (avgBattery)
+    SendGlobalStats
+
+- d.getAvgOrder().clear (avgOrder)
+    SendGlobalStats
+
+- d.getAvgKm().clear (avgKm)
+    SendGlobalStats
+
+- d.getAvgPollution().clear (avgPollution)
+    SendGlobalStats
+
+- d.getAvgBattery().clear (avgBattery)
+    SendGlobalStats
+
+- d.getnOrders() (nOrders)
+    Delivery
+
+- d.getMasterId() (masterId)
+    Delivery
+
+- d.getCoveredDistance() (coveredDistance)
+    Delivery
+
+- d.getMaster() (master)
+    Delivery
+
+- d.setDelivering (delivering)
+    Delivery
+
+- d.setPosition (d.position)
+    Delivery
+
+- d.setCoveredDistance (coveredDistance)
+    Delivery
+
+- d.setBattery (battery)
+    Delivery
+
+- d.setnOrders (nOrders)
+    Delivery
+
+- d.getAvgOrder().add (avgOrder)
+    Delivery
+
+- d.getAvgKm().add (avgKm)
+    Delivery
+
+- d.getAvgPollution().add (avgPollution)
+    Delivery
+
+- d.getAvgBattery().add (avgBattery)
+    Delivery
+
+- d.getNetworkTopology().addNewDrone() (networkTopology, dronesList)
+    ParallelCommunication
+
+- MainDrone.candidates.add
+    ParallelCommunication

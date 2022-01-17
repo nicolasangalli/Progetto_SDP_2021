@@ -10,12 +10,12 @@ Drone:
 1) MainDrone
 2) Console
 3) NetworkChecker
-4) BatteryChecker
-5) PM10Simulator
-6) MQTTSubscription
-7) SendGlobalStats
-8) Delivery
-9) ParallelCommunication
+4) PM10Simulator
+5) MQTTSubscription
+6) SendGlobalStats
+7) Delivery
+8) ParallelCommunication
+9) BatteryChecker
 
 
 1) MainDrone:
@@ -58,10 +58,71 @@ Drone:
         - it's not the master:
             - send the removed drone id to all the other drones (each has to remove it);
 
+    read:
+        - d.getNetworkTopology().getDronesList (networkTopology, dronesList)
+        - d.getNetworkTopology().getNextDrone (networkTopology, dronesList)
+        - d.getNetworkTopology().getDroneWithId (networkTopology, dronesList)
+        - d.getBattery (battery)
+        - d.getPosition() (d.position)
+    write:
+        - d.setParticipant (participant)
+        - d.setMaster (master)
+        - d.setMasterId (masterId)
+        - td.setPosition (td.position)
 
-4) BatteryChecker
-	- if batteryLevel < 15%:
-			same function as quit command in 'Console' thread
+4) PM10Simulator
+    read:
+    write:
+        - d.setPollutionLevel (pollutionLevel)
+
+5) MQTTSubscription
+    read:
+        - d.getOrderList (ordersList)
+        - d.getNetworkTopology().getDronesList() (dronesList)
+    write:
+        - d.addOrder (ordersList)
+        - d.getOrdersList().remove (orderList)
+
+6) SendGlobalStats
+    read:
+        - d.getAvgOrder (avgOrder)
+        - d.getAvgKm (avgKm)
+        - d.getAvgPollution (avgPollution)
+        - d.getAvgBattery (avgBattery)
+    write:
+        - d.getAvgOrder().clear (avgOrder)
+        - d.getAvgKm().clear (avgKm)
+        - d.getAvgPollution().clear (avgPollution)
+        - d.getAvgBattery().clear (avgBattery)
+7) Delivery
+    read:
+        - d.getBattery() (battery)
+        - d.getnOrders() (nOrders)
+        - d.getMasterId() (masterId)
+        - d.getPosition() (d.position)
+        - d.getCoveredDistance() (coveredDistance)
+        - d.getMaster() (master)
+        - d.getNetworkTopology().getDroneWithId (networkTopology, dronesList)
+    write:
+        - d.setDelivering (delivering)
+        - d.setPosition (d.position)
+        - d.setCoveredDistance (delivering)
+        - d.setBattery (battery)
+        - d.setnOrders (nOrders)
+        - d.getAvgOrder().add (avgOrder)
+        - d.getAvgKm().add (avgKm)
+        - d.getAvgPollution().add (avgPollution)
+        - d.getAvgBattery().add (avgBattery)
+
+8) ParallelCommunication
+    read:
+        - d.getPosition() (d.position)
+    write:
+        - d.getNetworkTopology().addNewDrone() (networkTopology, dronesList)
+        - d.setMasterId (masterId)
+        - MainDrone.candidates.add
+        - td.setPosition (td.position)
+
 
 - Sensori inquinamento:
 	- avvio il rilevamento:
@@ -73,3 +134,7 @@ Drone:
 					- svuoto i primi 4 valori dal buffer;
 			- NON pieno:
 				- ok, continuo;
+
+4) BatteryChecker
+	- if batteryLevel < 15%:
+			same function as quit command in 'Console' thread

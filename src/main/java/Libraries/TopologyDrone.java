@@ -48,7 +48,7 @@ public class TopologyDrone {
         return position;
     }
 
-    public void setPosition(Coordinate position) {
+    public synchronized void setPosition(Coordinate position) {
         this.position = position;
     }
 

@@ -13,7 +13,7 @@ public class NetworkTopology {
         dronesList = new ArrayList<>();
     }
 
-    public ArrayList<TopologyDrone> getDronesList() {
+    public synchronized ArrayList<TopologyDrone> getDronesList() {
         return dronesList;
     }
 
@@ -95,7 +95,7 @@ public class NetworkTopology {
         return dronesList.get(index);
     }
 
-    public synchronized String getNetworkDrones() {
+    public String getNetworkDrones() {
         String ret = "Drones in the network:\n";
         for (TopologyDrone d : dronesList) {
             ret += "(" + d.getId() + ", ip: " + d.getIp() + ", port: " + d.getPort() + ", pos:("+ d.getPosition().getX() + "," + d.getPosition().getY() + "))\n";
