@@ -60,7 +60,7 @@ public class ParallelCommunication extends Thread {
                 d.setMasterId(response.getMasterId());
                 System.out.println("Drone with id = " + td.getId() + " say: OK! The drone master id = " + d.getMasterId());
             } catch (StatusRuntimeException sre) {
-                System.out.println("Drone " + td.getId() + "not reachable");
+                System.out.println("Drone " + td.getId() + " not reachable");
                 MainDrone.removeFromSmartCity(td.getId());
             }
             channel.shutdownNow();
@@ -89,8 +89,7 @@ public class ParallelCommunication extends Thread {
 
                 td.setPosition(new Coordinate(response.getX(), response.getY()));
             } catch (StatusRuntimeException sre) {
-                System.out.println("Drone " + td.getId() + "not reachable");
-                MainDrone.removeFromSmartCity(td.getId());
+                System.out.println("Drone " + td.getId() + " not reachable");
             }
 
             channel.shutdownNow();
@@ -106,8 +105,7 @@ public class ParallelCommunication extends Thread {
             try {
                 stub.removeDrone(request);
             } catch (StatusRuntimeException sre) {
-                System.out.println("Drone " + td.getId() + "not reachable");
-                MainDrone.removeFromSmartCity(td.getId());
+                System.out.println("Drone " + td.getId() + " not reachable");
             }
 
             channel.shutdownNow();

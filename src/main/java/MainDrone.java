@@ -208,11 +208,6 @@ public class MainDrone {
 
     }
 
-    public static void removeFromSmartCity() {
-        WebResource webResource = client.resource(d.getServerAmmAddress() + "drone/remove");
-        webResource.type(MediaType.APPLICATION_JSON).delete(Integer.toString(d.getId()));
-    }
-
     public static void removeFromSmartCity(int id) {
         WebResource webResource = client.resource(d.getServerAmmAddress() + "drone/remove");
         ClientResponse response = webResource.type(MediaType.APPLICATION_JSON).delete(ClientResponse.class, Integer.toString(id));
@@ -250,7 +245,6 @@ public class MainDrone {
                         stub.deliverOrder(request);
                     } catch(StatusRuntimeException sre) {
                         System.out.println("Can't assign order " + order.getId());
-                        removeFromSmartCity(drone.getId());
                     }
 
                     channel.shutdownNow();
@@ -355,7 +349,7 @@ public class MainDrone {
 
         if(d.getMaster()) {
             try {
-                mqttSubscription.mqttClient.disconnect();
+                mqttSubscription.mqttClient.disconnectForcibly();
                 mqttSubscription.mqttClient.close();
             } catch (MqttException e) {
                 e.printStackTrace();
@@ -380,7 +374,7 @@ public class MainDrone {
                 e.printStackTrace();
             }
         }
-        removeFromSmartCity();
+        removeFromSmartCity(d.getId());
         System.exit(0);
     }
 
