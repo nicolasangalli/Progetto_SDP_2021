@@ -213,6 +213,14 @@ public class MainDrone {
         webResource.type(MediaType.APPLICATION_JSON).delete(Integer.toString(d.getId()));
     }
 
+    public static void removeFromSmartCity(int id) {
+        WebResource webResource = client.resource(d.getServerAmmAddress() + "drone/remove");
+        ClientResponse response = webResource.type(MediaType.APPLICATION_JSON).delete(ClientResponse.class, Integer.toString(id));
+        if(response.getStatus() == Response.Status.NOT_ACCEPTABLE.getStatusCode()) {
+            System.out.println("Drone " + id + " already removed");
+        }
+    }
+
     public static void assignOrder(Drone d, boolean itSelf) {
         if(d.getOrdersList().size() > 0) {
             Order order = d.getOrdersList().get(0);
@@ -238,7 +246,13 @@ public class MainDrone {
                             .setX2(order.getFinishPoint().getX())
                             .setY2(order.getFinishPoint().getY())
                             .build();
-                    stub.deliverOrder(request);
+                    try {
+                        stub.deliverOrder(request);
+                    } catch(StatusRuntimeException sre) {
+                        System.out.println("Can't assign order " + order.getId());
+                        removeFromSmartCity(drone.getId());
+                    }
+
                     channel.shutdownNow();
                 } else {
                     MainDrone.delivery = new Delivery(d, order);

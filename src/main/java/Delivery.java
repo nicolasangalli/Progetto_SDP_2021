@@ -3,6 +3,7 @@ import Libraries.Order;
 import Libraries.TopologyDrone;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
+import io.grpc.StatusRuntimeException;
 import java.sql.Timestamp;
 
 
@@ -63,7 +64,12 @@ public class Delivery extends Thread {
                     .setPollutionLevel(d.getPollutionLevel())
                     .setBattery(d.getBattery())
                     .build();
-            stub.deliverStats(request);
+            try {
+                stub.deliverStats(request);
+            } catch (StatusRuntimeException sre) {
+                System.out.println("Can't send info to master because is not reachable");
+                MainDrone.removeFromSmartCity(master.getId());
+            }
             channel.shutdownNow();
         } else {
             d.getAvgOrder().add(d.getnOrders());

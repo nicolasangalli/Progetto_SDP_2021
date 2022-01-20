@@ -4,6 +4,7 @@ import Libraries.Order;
 import Libraries.TopologyDrone;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
+import io.grpc.StatusRuntimeException;
 import java.util.ArrayList;
 
 
@@ -54,9 +55,14 @@ public class ParallelCommunication extends Thread {
                     .setX(d.getPosition().getX())
                     .setY(d.getPosition().getY())
                     .build();
-            NetworkService.Master response = stub.addNewDrone(request);
-            d.setMasterId(response.getMasterId());
-            System.out.println("Drone with id = " + td.getId() + " say: OK! The drone master id = " + d.getMasterId());
+            try {
+                NetworkService.Master response = stub.addNewDrone(request);
+                d.setMasterId(response.getMasterId());
+                System.out.println("Drone with id = " + td.getId() + " say: OK! The drone master id = " + d.getMasterId());
+            } catch (StatusRuntimeException sre) {
+                System.out.println("Drone " + td.getId() + "not reachable");
+                MainDrone.removeFromSmartCity(td.getId());
+            }
             channel.shutdownNow();
         } else if(type.equals("bestAvailableDrone")) {
             final ManagedChannel channel = ManagedChannelBuilder.forTarget(td.getIp() + ":" + td.getPort())
@@ -67,19 +73,25 @@ public class ParallelCommunication extends Thread {
             NetworkService.HelloRequest request = NetworkService.HelloRequest.newBuilder()
                     .setId(d.getId())
                     .build();
-            NetworkService.DroneDeliveryInfo response = stub.freeDrone(request);
 
-            if (response.getDelivery() == false) {
-                ArrayList<Integer> candidate = new ArrayList<>();
-                candidate.add(response.getId());
-                int distance = (int) Math.sqrt(Math.pow(order.getStartPoint().getX() - response.getX(), 2) + Math.pow(order.getStartPoint().getY() - response.getY(), 2));
-                candidate.add(distance);
-                candidate.add(response.getBattery());
+            try {
+                NetworkService.DroneDeliveryInfo response = stub.freeDrone(request);
 
-                MainDrone.candidates.add(candidate);
+                if (response.getDelivery() == false) {
+                    ArrayList<Integer> candidate = new ArrayList<>();
+                    candidate.add(response.getId());
+                    int distance = (int) Math.sqrt(Math.pow(order.getStartPoint().getX() - response.getX(), 2) + Math.pow(order.getStartPoint().getY() - response.getY(), 2));
+                    candidate.add(distance);
+                    candidate.add(response.getBattery());
+
+                    MainDrone.candidates.add(candidate);
+                }
+
+                td.setPosition(new Coordinate(response.getX(), response.getY()));
+            } catch (StatusRuntimeException sre) {
+                System.out.println("Drone " + td.getId() + "not reachable");
+                MainDrone.removeFromSmartCity(td.getId());
             }
-
-            td.setPosition(new Coordinate(response.getX(), response.getY()));
 
             channel.shutdownNow();
         } else if(type.equals("remove")) {
@@ -91,7 +103,13 @@ public class ParallelCommunication extends Thread {
             NetworkService.DroneId request = NetworkService.DroneId.newBuilder()
                     .setId(idDeletedDrone)
                     .build();
-            stub.removeDrone(request);
+            try {
+                stub.removeDrone(request);
+            } catch (StatusRuntimeException sre) {
+                System.out.println("Drone " + td.getId() + "not reachable");
+                MainDrone.removeFromSmartCity(td.getId());
+            }
+
             channel.shutdownNow();
         }
     }

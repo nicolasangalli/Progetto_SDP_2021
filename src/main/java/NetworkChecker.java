@@ -42,6 +42,7 @@ public class NetworkChecker extends Thread {
                     System.out.println("drone " + nextDrone.getId() + " reachable");
                 } catch (StatusRuntimeException sre) {
                     System.out.println("drone " + nextDrone.getId() + " not reachable");
+                    MainDrone.removeFromSmartCity(nextDrone.getId());
                     d.getNetworkTopology().removeDrone(nextDrone);
 
                     if(d.getNetworkTopology().getDronesList().size() > 1) {
