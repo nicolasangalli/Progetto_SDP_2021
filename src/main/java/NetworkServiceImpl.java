@@ -267,6 +267,52 @@ public class NetworkServiceImpl extends NetworkProtoGrpc.NetworkProtoImplBase {
         responseObserver.onCompleted();
     }
 
+    /*
+        Ricart and Agrawala algorithm
+        Return a dummy string to the caller or enqueue the id
+        Called when:
+        - the 'Delivery' thread of the caller has finished a delivery and the battery is < 15%
+     */
+    @Override
+    public void recharging(NetworkService.RechargeRequest request, StreamObserver<NetworkService.HelloResponse> responseObserver) {
+        if(d.isRequestRecharging() == false && d.isRecharging() == false) {
+            NetworkService.HelloResponse response = NetworkService.HelloResponse.newBuilder()
+                    .setResp("ok")
+                    .build();
+            responseObserver.onNext(response);
+            responseObserver.onCompleted();
+        } else if (d.isRecharging()) {
+            d.enqueue(request.getId());
+        } else if (d.isRequestRecharging()) {
+            if(request.getTimestamp() < d.getTimestamp()) {
+                NetworkService.HelloResponse response = NetworkService.HelloResponse.newBuilder()
+                        .setResp("ok")
+                        .build();
+                responseObserver.onNext(response);
+                responseObserver.onCompleted();
+            } else {
+                d.enqueue(request.getId());
+            }
+        }
+    }
+
+    /*
+        Ricart and Agrawala algorithm
+        Return a dummy string to the caller
+        Called when:
+        - the caller has recharged the battery and communicate to this drone to try to recharge his battery
+     */
+    @Override
+    public void rechargeOK(NetworkService.HelloRequest request, StreamObserver<NetworkService.HelloResponse> responseObserver) {
+        NetworkService.HelloResponse response = NetworkService.HelloResponse.newBuilder()
+                .setResp("ok")
+                .build();
+        responseObserver.onNext(response);
+        responseObserver.onCompleted();
+
+        MainDrone.rechargingRequest(d);
+    }
+
     public Drone getD() {
         return d;
     }

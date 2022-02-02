@@ -30,7 +30,6 @@ public class MainDrone {
     //Threads
     public static Console console;
     public static NetworkChecker networkChecker;
-    //public static BatteryChecker batteryChecker;
     public static PM10Simulator pm10Simulator;
     public static MQTTSubscription mqttSubscription;
     public static SendGlobalStats sendGlobalStats;
@@ -182,12 +181,6 @@ public class MainDrone {
         networkChecker = new NetworkChecker(d);
         networkChecker.start();
         System.out.println("NetworkChecker thread started");
-
-        /*
-        batteryChecker = new BatteryChecker(d);
-        batteryChecker.start();
-        System.out.println("BatteryChecker thread started");
-        */
 
         MeasurementBuffer myBuffer = new MeasurementBuffer(d);
         pm10Simulator = new PM10Simulator(myBuffer);
@@ -376,6 +369,86 @@ public class MainDrone {
         }
         removeFromSmartCity(d.getId());
         System.exit(0);
+    }
+
+    public static void rechargingRequest(Drone d) {
+        d.setRequestRecharging(true);
+        d.setTimestamp(System.currentTimeMillis());
+
+        ArrayList<TopologyDrone> dronesList = d.getNetworkTopology().getDronesList();
+        ArrayList<ParallelCommunication> parallelThreads = new ArrayList<>();
+
+        for(TopologyDrone td : dronesList) {
+            if(td.getId() != d.getId()) {
+                ParallelCommunication parallelCommunication = new ParallelCommunication(d, td, "recharge", d.getTimestamp());
+                parallelThreads.add(parallelCommunication);
+            }
+        }
+
+        for(ParallelCommunication pc : parallelThreads) {
+            pc.start();
+        }
+        for(ParallelCommunication pc : parallelThreads) {
+            try {
+                pc.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
+        d.setRequestRecharging(false);
+        d.setRecharging(true);
+
+        Recharge recharge = new Recharge(d);
+        recharge.start();
+        System.out.println("Recharge thread started");
+        try {
+            recharge.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        d.setRecharging(false);
+
+        if(d.getMaster() == false) {
+            TopologyDrone master = d.getNetworkTopology().getDroneWithId(d.getMasterId());
+            final ManagedChannel channel = ManagedChannelBuilder.forTarget(master.getIp() + ":" + master.getPort())
+                    .usePlaintext(true)
+                    .build();
+
+            NetworkProtoGrpc.NetworkProtoBlockingStub stub = NetworkProtoGrpc.newBlockingStub(channel);
+            NetworkService.DronePosition request = NetworkService.DronePosition.newBuilder()
+                    .setId(d.getId())
+                    .setX(d.getPosition().getX())
+                    .setY(d.getPosition().getY())
+                    .build();
+            try {
+                stub.newDronePosition(request);
+            } catch (StatusRuntimeException sre) {
+                System.out.println("Drone " + master.getId() + " not reachable");
+            }
+            channel.shutdownNow();
+        }
+
+        if(d.getQueue().size() > 0) {
+            dronesList = d.getNetworkTopology().getDronesList();
+            parallelThreads = new ArrayList<>();
+            for(TopologyDrone td : dronesList) {
+                if(d.inQueue(td.getId())) {
+                    ParallelCommunication parallelCommunication = new ParallelCommunication(d, td, "rechargeOk");
+                    parallelThreads.add(parallelCommunication);
+                }
+            }
+
+            for(ParallelCommunication pc : parallelThreads) {
+                pc.start();
+            }
+
+            d.getQueue().clear();
+        }
+
+        System.out.println("Recharged ok");
+        d.setDelivering(false);
     }
 
 }

@@ -8,6 +8,8 @@ service NetworkProto {
     rpc FreeDrone(HelloRequest) returns(DroneDeliveryInfo) {};
     rpc DeliverOrder(Order) returns(HelloResponse) {};
     rpc DeliverStats(DroneStats) returns(HelloResponse) {};
+    rpc Recharging(RechargeRequest) returns(HelloResponse) {};
+    rpc RechargeOK(HelloRequest) returns(HelloResponse) {};
 }
 
 message NewDrone {
@@ -71,4 +73,9 @@ message DroneStats {
     required int32 distance = 6;
     required double pollutionLevel = 7;
     required int32 battery = 8;
+}
+
+message RechargeRequest {
+    required int32 id = 1;
+    required int64 timestamp = 2;
 }

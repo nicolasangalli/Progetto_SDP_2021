@@ -39,7 +39,7 @@ public class NetworkChecker extends Thread {
                             .build();
                     stub.greeting(request);
                     channel.shutdownNow();
-                    System.out.println("drone " + nextDrone.getId() + " reachable");
+                    //System.out.println("drone " + nextDrone.getId() + " reachable");
                 } catch (StatusRuntimeException sre) {
                     System.out.println("drone " + nextDrone.getId() + " not reachable");
                     MainDrone.removeFromSmartCity(nextDrone.getId());

@@ -79,10 +79,10 @@ public class Delivery extends Thread {
             }
         }
 
-        d.setDelivering(false);
-
         if(d.getBattery() < 15) {
-            MainDrone.explicitExit(d);
+            MainDrone.rechargingRequest(d);
+        } else {
+            d.setDelivering(false);
         }
 
     }

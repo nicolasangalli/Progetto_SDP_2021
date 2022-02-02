@@ -15,6 +15,7 @@ public class ParallelCommunication extends Thread {
     private String type;
     private Order order;
     private int idDeletedDrone;
+    private long timestamp;
 
     public ParallelCommunication(Drone d, TopologyDrone td, String type) {
         this.d = d;
@@ -22,6 +23,7 @@ public class ParallelCommunication extends Thread {
         this.type = type;
         this.order = null;
         this.idDeletedDrone = -1;
+        this.timestamp = 0;
     }
 
     public ParallelCommunication(Drone d, TopologyDrone td, String type, Order order) {
@@ -30,6 +32,7 @@ public class ParallelCommunication extends Thread {
         this.type = type;
         this.order = order;
         this.idDeletedDrone = -1;
+        this.timestamp = 0;
     }
 
     public ParallelCommunication(Drone d, TopologyDrone td, String type, int idDeletedDrone) {
@@ -38,6 +41,16 @@ public class ParallelCommunication extends Thread {
         this.type = type;
         this.order = null;
         this.idDeletedDrone = idDeletedDrone;
+        this.timestamp = 0;
+    }
+
+    public ParallelCommunication(Drone d, TopologyDrone td, String type, long timestamp) {
+        this.d = d;
+        this.td = td;
+        this.type = type;
+        this.order = null;
+        this.idDeletedDrone = -1;
+        this.timestamp = timestamp;
     }
 
     public void run() {
@@ -104,6 +117,39 @@ public class ParallelCommunication extends Thread {
                     .build();
             try {
                 stub.removeDrone(request);
+            } catch (StatusRuntimeException sre) {
+                System.out.println("Drone " + td.getId() + " not reachable");
+            }
+
+            channel.shutdownNow();
+        } else if(type.equals("recharge")) {
+            final ManagedChannel channel = ManagedChannelBuilder.forTarget(td.getIp() + ":" + td.getPort())
+                    .usePlaintext(true)
+                    .build();
+
+            NetworkProtoGrpc.NetworkProtoBlockingStub stub = NetworkProtoGrpc.newBlockingStub(channel);
+            NetworkService.RechargeRequest request = NetworkService.RechargeRequest.newBuilder()
+                    .setId(d.getId())
+                    .setTimestamp(timestamp)
+                    .build();
+            try {
+                stub.recharging(request);
+            } catch (StatusRuntimeException sre) {
+                System.out.println("Drone " + td.getId() + " not reachable");
+            }
+
+            channel.shutdownNow();
+        } else if(type.equals("rechargeOk")) {
+            final ManagedChannel channel = ManagedChannelBuilder.forTarget(td.getIp() + ":" + td.getPort())
+                    .usePlaintext(true)
+                    .build();
+
+            NetworkProtoGrpc.NetworkProtoBlockingStub stub = NetworkProtoGrpc.newBlockingStub(channel);
+            NetworkService.HelloRequest request = NetworkService.HelloRequest.newBuilder()
+                    .setId(d.getId())
+                    .build();
+            try {
+                stub.rechargeOK(request);
             } catch (StatusRuntimeException sre) {
                 System.out.println("Drone " + td.getId() + " not reachable");
             }

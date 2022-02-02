@@ -34,6 +34,12 @@ public class Drone {
     private ArrayList<Double> avgPollution;
     private ArrayList<Integer> avgBattery;
 
+    //Ricart and Agrawala;
+    private boolean requestRecharging;
+    private long timestamp;
+    private boolean recharging;
+    private ArrayList<Integer> queue;
+
     public Drone() {}
 
     public Drone(int id, String ip, int port, String serverAmmAddress) {
@@ -59,6 +65,11 @@ public class Drone {
         avgKm = new ArrayList<>();
         avgPollution = new ArrayList<>();
         avgBattery = new ArrayList<>();
+
+        requestRecharging = false;
+        timestamp = 0;
+        recharging = false;
+        queue = new ArrayList<>();
     }
 
     public int getId() {
@@ -211,6 +222,47 @@ public class Drone {
 
     public void setAvgBattery(ArrayList<Integer> avgBattery) {
         this.avgBattery = avgBattery;
+    }
+
+    public boolean isRequestRecharging() {
+        return requestRecharging;
+    }
+
+    public void setRequestRecharging(boolean requestRecharging) {
+        this.requestRecharging = requestRecharging;
+    }
+
+    public long getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(long timestamp) {
+        this.timestamp = timestamp;
+    }
+
+    public boolean isRecharging() {
+        return recharging;
+    }
+
+    public void setRecharging(boolean recharging) {
+        this.recharging = recharging;
+    }
+
+    public ArrayList<Integer> getQueue() {
+        return queue;
+    }
+
+    public void enqueue(int id) {
+        queue.add(id);
+    }
+
+    public boolean inQueue(int id) {
+        for(int i : queue) {
+            if(i == id) {
+                return  true;
+            }
+        }
+        return false;
     }
 
     public String getStatus() {

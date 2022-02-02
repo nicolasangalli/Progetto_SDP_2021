@@ -17,6 +17,8 @@ public class Console extends Thread {
             String input = scanner.nextLine();
             if(input.trim().equalsIgnoreCase("quit") || input.trim().equalsIgnoreCase("q") || input.trim().equalsIgnoreCase("exit")) {
                 MainDrone.explicitExit(d);
+            } else if(input.trim().equalsIgnoreCase("recharge")) {
+                MainDrone.rechargingRequest(d);
             }
             //debug command
             else if(input.trim().equalsIgnoreCase("print")) {
