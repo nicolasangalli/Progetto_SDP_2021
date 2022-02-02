@@ -372,6 +372,7 @@ public class MainDrone {
     }
 
     public static void rechargingRequest(Drone d) {
+        d.setDelivering(true);
         d.setRequestRecharging(true);
         d.setTimestamp(System.currentTimeMillis());
 
