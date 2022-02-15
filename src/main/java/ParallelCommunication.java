@@ -111,12 +111,12 @@ public class ParallelCommunication extends Thread {
                     .usePlaintext(true)
                     .build();
 
-            NetworkProtoGrpc.NetworkProtoBlockingStub stub = NetworkProtoGrpc.newBlockingStub(channel);
+            NetworkProtoGrpc.NetworkProtoStub stub = NetworkProtoGrpc.newStub(channel);
             NetworkService.DroneId request = NetworkService.DroneId.newBuilder()
                     .setId(idDeletedDrone)
                     .build();
             try {
-                stub.removeDrone(request);
+                stub.removeDrone(request, new StreamObserverCallback());
             } catch (StatusRuntimeException sre) {
                 System.out.println("Drone " + td.getId() + " not reachable");
             }

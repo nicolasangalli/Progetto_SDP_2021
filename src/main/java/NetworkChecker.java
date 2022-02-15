@@ -3,6 +3,8 @@ import Libraries.TopologyDrone;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.StatusRuntimeException;
+
+import javax.security.auth.callback.Callback;
 import java.util.ArrayList;
 
 
@@ -55,13 +57,13 @@ public class NetworkChecker extends Thread {
                                     .usePlaintext(true)
                                     .build();
 
-                            NetworkProtoGrpc.NetworkProtoBlockingStub stub2 = NetworkProtoGrpc.newBlockingStub(channel2);
+                            NetworkProtoGrpc.NetworkProtoStub stub2 = NetworkProtoGrpc.newStub(channel2);
                             NetworkService.ElectionMsg request2 = NetworkService.ElectionMsg.newBuilder()
                                     .setId(d.getId())
                                     .setBattery(d.getBattery())
                                     .setIdOldMaster(idDeletedDrone)
                                     .build();
-                            stub2.election(request2);
+                            stub2.election(request2, new StreamObserverCallback());
                             channel.shutdownNow();
                         } else {
                             System.out.println("Droni rimasti: " + d.getNetworkTopology().getDronesList().size());
@@ -71,19 +73,6 @@ public class NetworkChecker extends Thread {
                                 for (TopologyDrone td : d.getNetworkTopology().getDronesList()) {
                                     ParallelCommunication parallelCommunication = new ParallelCommunication(d, td, "remove", idDeletedDrone);
                                     parallelThreads.add(parallelCommunication);
-
-                                    /*
-                                    final ManagedChannel channel2 = ManagedChannelBuilder.forTarget(td.getIp() + ":" + td.getPort())
-                                            .usePlaintext(true)
-                                            .build();
-
-                                    NetworkProtoGrpc.NetworkProtoBlockingStub stub2 = NetworkProtoGrpc.newBlockingStub(channel2);
-                                    NetworkService.DroneId request2 = NetworkService.DroneId.newBuilder()
-                                            .setId(idDeletedDrone)
-                                            .build();
-                                    stub2.removeDrone(request2);
-                                    channel.shutdownNow();
-                                    */
                                 }
                                 for (ParallelCommunication pc : parallelThreads) {
                                     pc.start();

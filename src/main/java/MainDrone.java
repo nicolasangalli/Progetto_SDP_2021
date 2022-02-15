@@ -9,6 +9,7 @@ import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import io.grpc.*;
+import io.grpc.stub.StreamObserver;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -145,30 +146,6 @@ public class MainDrone {
                     e.printStackTrace();
                 }
             }
-
-            /*
-            for(TopologyDrone otherDrone : dronesList) {
-                if(otherDrone.getId() != d.getId()) {
-                    System.out.println("Try to communicate with drone with id = " + otherDrone.getId());
-                    final ManagedChannel channel = ManagedChannelBuilder.forTarget(otherDrone.getIp() + ":" + otherDrone.getPort())
-                            .usePlaintext(true)
-                            .build();
-
-                    NetworkProtoGrpc.NetworkProtoBlockingStub stub = NetworkProtoGrpc.newBlockingStub(channel);
-                    NetworkService.NewDrone request = NetworkService.NewDrone.newBuilder()
-                            .setId(d.getId())
-                            .setIp(d.getIp())
-                            .setPort(d.getPort())
-                            .setX(d.getPosition().getX())
-                            .setY(d.getPosition().getY())
-                            .build();
-                    NetworkService.Master response = stub.addNewDrone(request);
-                    d.setMasterId(response.getMasterId());
-                    System.out.println("Drone with id = " + otherDrone.getId() + " say: OK! The drone master id = " + d.getMasterId());
-                    channel.shutdownNow();
-                }
-            }
-            */
         }
         System.out.println("Network ring generated!\n");
     }
@@ -226,7 +203,7 @@ public class MainDrone {
                             .usePlaintext(true)
                             .build();
 
-                    NetworkProtoGrpc.NetworkProtoBlockingStub stub = NetworkProtoGrpc.newBlockingStub(channel);
+                    NetworkProtoGrpc.NetworkProtoStub stub = NetworkProtoGrpc.newStub(channel);
                     NetworkService.Order request = NetworkService.Order.newBuilder()
                             .setOrderId(order.getId())
                             .setX1(order.getStartPoint().getX())
@@ -235,7 +212,7 @@ public class MainDrone {
                             .setY2(order.getFinishPoint().getY())
                             .build();
                     try {
-                        stub.deliverOrder(request);
+                        stub.deliverOrder(request, new StreamObserverCallback());
                     } catch(StatusRuntimeException sre) {
                         System.out.println("Can't assign order " + order.getId());
                     }
@@ -258,32 +235,6 @@ public class MainDrone {
             if(td.getId() != d.getId()) {
                 ParallelCommunication parallelCommunication = new ParallelCommunication(d, td, "bestAvailableDrone", order);
                 parallelThreads.add(parallelCommunication);
-
-                /*
-                final ManagedChannel channel = ManagedChannelBuilder.forTarget(td.getIp() + ":" + td.getPort())
-                        .usePlaintext(true)
-                        .build();
-
-                NetworkProtoGrpc.NetworkProtoBlockingStub stub = NetworkProtoGrpc.newBlockingStub(channel);
-                NetworkService.HelloRequest request = NetworkService.HelloRequest.newBuilder()
-                        .setId(d.getId())
-                        .build();
-                NetworkService.DroneDeliveryInfo response = stub.freeDrone(request);
-
-                if (response.getDelivery() == false) {
-                    ArrayList<Integer> candidate = new ArrayList<>();
-                    candidate.add(response.getId());
-                    int distance = (int) Math.sqrt(Math.pow(order.getStartPoint().getX() - response.getX(), 2) + Math.pow(order.getStartPoint().getY() - response.getY(), 2));
-                    candidate.add(distance);
-                    candidate.add(response.getBattery());
-
-                    candidates.add(candidate);
-                }
-
-                td.setPosition(new Coordinate(response.getX(), response.getY()));
-
-                channel.shutdownNow();
-                */
             } else {
                 if (d.getDelivering() == false && itSelf == true) {
                     ArrayList<Integer> candidate = new ArrayList<>();
@@ -417,14 +368,14 @@ public class MainDrone {
                     .usePlaintext(true)
                     .build();
 
-            NetworkProtoGrpc.NetworkProtoBlockingStub stub = NetworkProtoGrpc.newBlockingStub(channel);
+            NetworkProtoGrpc.NetworkProtoStub stub = NetworkProtoGrpc.newStub(channel);
             NetworkService.DronePosition request = NetworkService.DronePosition.newBuilder()
                     .setId(d.getId())
                     .setX(d.getPosition().getX())
                     .setY(d.getPosition().getY())
                     .build();
             try {
-                stub.newDronePosition(request);
+                stub.newDronePosition(request, new StreamObserverCallback());
             } catch (StatusRuntimeException sre) {
                 System.out.println("Drone " + master.getId() + " not reachable");
             }

@@ -54,7 +54,7 @@ public class Delivery extends Thread {
                         .usePlaintext(true)
                         .build();
 
-                NetworkProtoGrpc.NetworkProtoBlockingStub stub = NetworkProtoGrpc.newBlockingStub(channel);
+                NetworkProtoGrpc.NetworkProtoStub stub = NetworkProtoGrpc.newStub(channel);
                 NetworkService.DroneStats request = NetworkService.DroneStats.newBuilder()
                         .setTimestamp(new Timestamp(System.currentTimeMillis()).toString())
                         .setId(d.getId())
@@ -66,7 +66,7 @@ public class Delivery extends Thread {
                         .setBattery(d.getBattery())
                         .build();
                 try {
-                    stub.deliverStats(request);
+                    stub.deliverStats(request, new StreamObserverCallback());
                 } catch (StatusRuntimeException sre) {
                     System.out.println("Can't send info to master because is not reachable");
                 }
