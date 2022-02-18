@@ -85,12 +85,12 @@ public class NetworkServiceImpl extends NetworkProtoGrpc.NetworkProtoImplBase {
             final ManagedChannel channel = ManagedChannelBuilder.forTarget(nextDrone.getIp() + ":" + nextDrone.getPort())
                     .usePlaintext(true)
                     .build();
-            NetworkProtoGrpc.NetworkProtoStub stub = NetworkProtoGrpc.newStub(channel);
+            NetworkProtoGrpc.NetworkProtoBlockingStub stub = NetworkProtoGrpc.newBlockingStub(channel);
             NetworkService.ElectionMsg req = NetworkService.ElectionMsg.newBuilder()
                     .setId(id)
                     .setBattery(battery)
                     .build();
-            stub.election(req, new StreamObserverCallback());
+            stub.election(req);
             channel.shutdownNow();
         } else if(battery < d.getBattery() || (battery == d.getBattery() && id < d.getId())) {
             if(d.getParticipant() == false) {
@@ -100,12 +100,12 @@ public class NetworkServiceImpl extends NetworkProtoGrpc.NetworkProtoImplBase {
                 final ManagedChannel channel = ManagedChannelBuilder.forTarget(nextDrone.getIp() + ":" + nextDrone.getPort())
                         .usePlaintext(true)
                         .build();
-                NetworkProtoGrpc.NetworkProtoStub stub = NetworkProtoGrpc.newStub(channel);
+                NetworkProtoGrpc.NetworkProtoBlockingStub stub = NetworkProtoGrpc.newBlockingStub(channel);
                 NetworkService.ElectionMsg req = NetworkService.ElectionMsg.newBuilder()
                         .setId(d.getId())
                         .setBattery(d.getBattery())
                         .build();
-                stub.election(req, new StreamObserverCallback());
+                stub.election(req);
                 channel.shutdownNow();
             }
         } else if(id == d.getId()) { //master
@@ -119,11 +119,11 @@ public class NetworkServiceImpl extends NetworkProtoGrpc.NetworkProtoImplBase {
             final ManagedChannel channel = ManagedChannelBuilder.forTarget(nextDrone.getIp() + ":" + nextDrone.getPort())
                     .usePlaintext(true)
                     .build();
-            NetworkProtoGrpc.NetworkProtoStub stub = NetworkProtoGrpc.newStub(channel);
+            NetworkProtoGrpc.NetworkProtoBlockingStub stub = NetworkProtoGrpc.newBlockingStub(channel);
             NetworkService.ElectionMsg req = NetworkService.ElectionMsg.newBuilder()
                     .setId(d.getId())
                     .build();
-            stub.elected(req, new StreamObserverCallback());
+            stub.elected(req);
             channel.shutdownNow();
         }
 
@@ -153,11 +153,11 @@ public class NetworkServiceImpl extends NetworkProtoGrpc.NetworkProtoImplBase {
             final ManagedChannel channel = ManagedChannelBuilder.forTarget(nextDrone.getIp() + ":" + nextDrone.getPort())
                     .usePlaintext(true)
                     .build();
-            NetworkProtoGrpc.NetworkProtoStub stub = NetworkProtoGrpc.newStub(channel);
+            NetworkProtoGrpc.NetworkProtoBlockingStub stub = NetworkProtoGrpc.newBlockingStub(channel);
             NetworkService.ElectionMsg req = NetworkService.ElectionMsg.newBuilder()
                     .setId(id)
                     .build();
-            stub.elected(req, new StreamObserverCallback());
+            stub.elected(req);
             channel.shutdownNow();
 
             //send the drone position to master
@@ -165,13 +165,13 @@ public class NetworkServiceImpl extends NetworkProtoGrpc.NetworkProtoImplBase {
             final ManagedChannel channel2 = ManagedChannelBuilder.forTarget(master.getIp() + ":" + master.getPort())
                     .usePlaintext(true)
                     .build();
-            NetworkProtoGrpc.NetworkProtoStub stub2 = NetworkProtoGrpc.newStub(channel2);
+            NetworkProtoGrpc.NetworkProtoBlockingStub stub2 = NetworkProtoGrpc.newBlockingStub(channel2);
             NetworkService.DronePosition req2 = NetworkService.DronePosition.newBuilder()
                     .setId(d.getId())
                     .setX(d.getPosition().getX())
                     .setY(d.getPosition().getY())
                     .build();
-            stub2.newDronePosition(req2, new StreamObserverCallback());
+            stub2.newDronePosition(req2);
             channel2.shutdownNow();
         } else { //master
             MainDrone.mqttSubscription = new MQTTSubscription(d);

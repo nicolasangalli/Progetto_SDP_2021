@@ -66,11 +66,10 @@ public class Delivery extends Thread {
                         .setBattery(d.getBattery())
                         .build();
                 try {
-                    stub.deliverStats(request, new StreamObserverCallback());
+                    stub.deliverStats(request, new StreamObserverCallback(channel));
                 } catch (StatusRuntimeException sre) {
                     System.out.println("Can't send info to master because is not reachable");
                 }
-                channel.shutdownNow();
             } else {
                 d.getAvgOrder().add(d.getnOrders());
                 d.getAvgKm().add(d.getCoveredDistance());

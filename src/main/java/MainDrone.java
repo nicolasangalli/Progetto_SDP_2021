@@ -9,7 +9,6 @@ import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import io.grpc.*;
-import io.grpc.stub.StreamObserver;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -212,12 +211,10 @@ public class MainDrone {
                             .setY2(order.getFinishPoint().getY())
                             .build();
                     try {
-                        stub.deliverOrder(request, new StreamObserverCallback());
+                        stub.deliverOrder(request, new StreamObserverCallback(channel));
                     } catch(StatusRuntimeException sre) {
                         System.out.println("Can't assign order " + order.getId());
                     }
-
-                    channel.shutdownNow();
                 } else {
                     MainDrone.delivery = new Delivery(d, order);
                     MainDrone.delivery.start();
@@ -375,11 +372,10 @@ public class MainDrone {
                     .setY(d.getPosition().getY())
                     .build();
             try {
-                stub.newDronePosition(request, new StreamObserverCallback());
+                stub.newDronePosition(request, new StreamObserverCallback(channel));
             } catch (StatusRuntimeException sre) {
                 System.out.println("Drone " + master.getId() + " not reachable");
             }
-            channel.shutdownNow();
         }
 
         if(d.getQueue().size() > 0) {

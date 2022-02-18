@@ -116,12 +116,10 @@ public class ParallelCommunication extends Thread {
                     .setId(idDeletedDrone)
                     .build();
             try {
-                stub.removeDrone(request, new StreamObserverCallback());
+                stub.removeDrone(request, new StreamObserverCallback(channel));
             } catch (StatusRuntimeException sre) {
                 System.out.println("Drone " + td.getId() + " not reachable");
             }
-
-            channel.shutdownNow();
         } else if(type.equals("recharge")) {
             final ManagedChannel channel = ManagedChannelBuilder.forTarget(td.getIp() + ":" + td.getPort())
                     .usePlaintext(true)
