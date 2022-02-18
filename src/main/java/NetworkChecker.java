@@ -41,7 +41,7 @@ public class NetworkChecker extends Thread {
                     channel.shutdownNow();
                     //System.out.println("drone " + nextDrone.getId() + " reachable");
                 } catch (StatusRuntimeException sre) {
-                    System.out.println("drone " + nextDrone.getId() + " not reachable");
+                    //System.out.println("drone " + nextDrone.getId() + " not reachable");
                     MainDrone.removeFromSmartCity(nextDrone.getId());
                     d.getNetworkTopology().removeDrone(nextDrone);
 
@@ -50,7 +50,7 @@ public class NetworkChecker extends Thread {
 
                             d.setParticipant(true);
                             nextDrone = d.getNetworkTopology().getNextDrone(d);
-                            System.out.println("next drone: " + nextDrone.getId());
+                            //System.out.println("next drone: " + nextDrone.getId());
                             final ManagedChannel channel2 = ManagedChannelBuilder.forTarget(nextDrone.getIp() + ":" + nextDrone.getPort())
                                     .usePlaintext(true)
                                     .build();
@@ -64,7 +64,7 @@ public class NetworkChecker extends Thread {
                             stub2.election(request2);
                             channel.shutdownNow();
                         } else {
-                            System.out.println("Droni rimasti: " + d.getNetworkTopology().getDronesList().size());
+                            //System.out.println("Droni rimasti: " + d.getNetworkTopology().getDronesList().size());
 
                             if(d.getNetworkTopology().getDronesList().size() > 0) {
                                 ArrayList<ParallelCommunication> parallelThreads = new ArrayList<>();

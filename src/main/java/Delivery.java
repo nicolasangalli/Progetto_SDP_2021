@@ -44,8 +44,8 @@ public class Delivery extends Thread {
             d.setnOrders(d.getnOrders() + 1);
             d.setCoveredDistance(d.getCoveredDistance() + distance);
 
-            System.out.println("Order " + order.getId());
-            System.out.println("Battery level: " + d.getBattery());
+            //System.out.println("Order " + order.getId());
+            //System.out.println("Battery level: " + d.getBattery());
 
             //info to master
             if (d.getMaster() == false) {

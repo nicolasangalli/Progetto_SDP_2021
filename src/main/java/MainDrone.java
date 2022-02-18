@@ -163,6 +163,10 @@ public class MainDrone {
         pm10Simulator.start();
         System.out.println("PM10Simulator thread started");
 
+        PrintInfo printInfo = new PrintInfo(d);
+        printInfo.start();
+        System.out.println("PrintInfo thread started");
+
         if(d.getMaster()) {
             mqttSubscription = new MQTTSubscription(d);
             mqttSubscription.start();
