@@ -15,7 +15,8 @@ Drone:
 6) SendGlobalStats
 7) Delivery
 8) ParallelCommunication
-9) BatteryChecker
+9) Recharge
+10) PrintInfo
 
 
 1) MainDrone:

@@ -34,6 +34,7 @@ public class MainDrone {
     public static MQTTSubscription mqttSubscription;
     public static SendGlobalStats sendGlobalStats;
     public static Delivery delivery;
+    public static PrintInfo printInfo;
 
     public static void main(String[] args) {
         gson = new Gson();
@@ -163,7 +164,7 @@ public class MainDrone {
         pm10Simulator.start();
         System.out.println("PM10Simulator thread started");
 
-        PrintInfo printInfo = new PrintInfo(d);
+        printInfo = new PrintInfo(d);
         printInfo.start();
         System.out.println("PrintInfo thread started");
 
