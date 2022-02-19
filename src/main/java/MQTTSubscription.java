@@ -40,7 +40,7 @@ public class MQTTSubscription extends Thread {
                 }
 
                 public void connectionLost(Throwable cause) {
-                    System.out.println("Test " + clientId + " lost connection (" + cause.getMessage()+ ")");
+                    System.out.println(clientId + " lost connection (" + cause.getMessage()+ ")");
                 }
 
                 public void deliveryComplete(IMqttDeliveryToken token) {}
